@@ -17,6 +17,7 @@ const ui = {
   eventDescription: document.getElementById("eventDescription"),
   eventTradeButton: document.getElementById("eventTradeButton"),
   taskList: document.getElementById("taskList"),
+  exclusiveShopList: document.getElementById("exclusiveShopList"),
   shopList: document.getElementById("shopList"),
   inventoryList: document.getElementById("inventoryList"),
   petList: document.getElementById("petList"),
@@ -126,6 +127,58 @@ const seeds = {
     growTime: 280,
     color: "#81d8e8",
     leaf: "#b8f2f0"
+  },
+  honeySprout: {
+    id: "honeySprout",
+    kind: "seed",
+    name: "Honey Sprout",
+    crop: "Honey Sprouts",
+    cost: 65,
+    value: 210,
+    growTime: 72,
+    eventOnly: "honey",
+    currency: "event",
+    color: "#f0bd45",
+    leaf: "#8fc65c"
+  },
+  discoSeed: {
+    id: "discoSeed",
+    kind: "seed",
+    name: "Disco Seed",
+    crop: "Disco Fruit",
+    cost: 85,
+    value: 310,
+    growTime: 82,
+    eventOnly: "disco",
+    currency: "event",
+    color: "#ff6bd6",
+    leaf: "#75e7ff"
+  },
+  nightSeed: {
+    id: "nightSeed",
+    kind: "seed",
+    name: "Night Seed",
+    crop: "Night Fruit",
+    cost: 95,
+    value: 390,
+    growTime: 96,
+    eventOnly: "bloodMoon",
+    currency: "event",
+    color: "#7c6dff",
+    leaf: "#aeb8ff"
+  },
+  cometSeed: {
+    id: "cometSeed",
+    kind: "seed",
+    name: "Comet Seed",
+    crop: "Comet Fruit",
+    cost: 115,
+    value: 540,
+    growTime: 118,
+    eventOnly: "galaxy",
+    currency: "event",
+    color: "#81d8e8",
+    leaf: "#f4f1e8"
   }
 };
 
@@ -317,6 +370,73 @@ const pets = {
   }
 };
 
+const exclusiveItems = {
+  honeySprout: { id: "honeySprout", type: "seed", itemId: "honeySprout", event: "honey", cost: 65 },
+  honeyGlazer: { id: "honeyGlazer", type: "gear", itemId: "honeyGlazer", event: "honey", cost: 90 },
+  honeyEgg: {
+    id: "honeyEgg",
+    type: "egg",
+    name: "Honey Egg",
+    event: "honey",
+    cost: 140,
+    color: "#f0bd45",
+    description: "Hatches into a bee-themed garden pet.",
+    hatchPets: ["bee", "queenBee", "squirrel"]
+  },
+  discoSeed: { id: "discoSeed", type: "seed", itemId: "discoSeed", event: "disco", cost: 85 },
+  discoBall: {
+    id: "discoBall",
+    type: "cosmetic",
+    name: "Disco Ball",
+    event: "disco",
+    cost: 110,
+    color: "#ff6bd6",
+    description: "Adds a spinning disco ball to your plot."
+  },
+  nightSeed: { id: "nightSeed", type: "seed", itemId: "nightSeed", event: "bloodMoon", cost: 95 },
+  moonLamp: {
+    id: "moonLamp",
+    type: "cosmetic",
+    name: "Moon Lamp",
+    event: "bloodMoon",
+    cost: 130,
+    color: "#aeb8ff",
+    description: "Places a glowing moon lamp by the plot."
+  },
+  cometSeed: { id: "cometSeed", type: "seed", itemId: "cometSeed", event: "galaxy", cost: 115 },
+  starCrate: {
+    id: "starCrate",
+    type: "egg",
+    name: "Star Crate",
+    event: "galaxy",
+    cost: 180,
+    color: "#81d8e8",
+    description: "Hatches into a rare cosmic pet.",
+    hatchPets: ["owl", "phoenix", "lotusSpirit"]
+  },
+  snowLantern: { id: "snowLantern", type: "gear", itemId: "snowLantern", event: "christmas", cost: 110 },
+  snowEgg: {
+    id: "snowEgg",
+    type: "egg",
+    name: "Snow Egg",
+    event: "christmas",
+    cost: 150,
+    color: "#b9e7ff",
+    description: "Hatches into a winter pet.",
+    hatchPets: ["snowSprite", "turtle", "frog"]
+  },
+  zenRake: { id: "zenRake", type: "gear", itemId: "zenRake", event: "zen", cost: 130 },
+  lotusBell: {
+    id: "lotusBell",
+    type: "cosmetic",
+    name: "Lotus Bell",
+    event: "zen",
+    cost: 135,
+    color: "#e6a7ca",
+    description: "Adds a calm lotus bell cosmetic to your garden."
+  }
+};
+
 const events = [
   {
     id: "drizzle",
@@ -433,6 +553,7 @@ const events = [
     currencyLabel: "honey",
     turnInLabel: "Turn In Fruit for Honey",
     turnInRate: 16,
+    exclusiveShop: ["honeySprout", "honeyGlazer", "honeyEgg"],
     tasks: [
       { id: "turnIn", label: "Turn in fruit twice", target: 2, reward: 32 },
       { id: "harvest", label: "Harvest 8 fruits", target: 8, reward: 24 }
@@ -450,6 +571,7 @@ const events = [
     currencyLabel: "snowflakes",
     turnInLabel: "Wrap Fruit Gifts",
     turnInRate: 18,
+    exclusiveShop: ["snowLantern", "snowEgg"],
     tasks: [
       { id: "turnIn", label: "Wrap 3 fruit gifts", target: 3, reward: 36 },
       { id: "buy", label: "Buy 3 shop items", target: 3, reward: 22 }
@@ -467,6 +589,7 @@ const events = [
     currencyLabel: "chi",
     turnInLabel: "Offer Fruit for Chi",
     turnInRate: 20,
+    exclusiveShop: ["zenRake", "lotusBell"],
     tasks: [
       { id: "turnIn", label: "Make 2 fruit offerings", target: 2, reward: 34 },
       { id: "plant", label: "Plant 7 seeds", target: 7, reward: 21 }
@@ -481,6 +604,7 @@ const events = [
     saleMultiplier: 1,
     mutation: "disco",
     mutationChance: 0.2,
+    exclusiveShop: ["discoSeed", "discoBall"],
     tasks: [
       { id: "mutatedHarvest", label: "Harvest 3 mutated fruits", target: 3, reward: 42 },
       { id: "plant", label: "Plant 9 seeds", target: 9, reward: 24 }
@@ -495,6 +619,7 @@ const events = [
     saleMultiplier: 1.35,
     mutation: "lunar",
     mutationChance: 0.18,
+    exclusiveShop: ["nightSeed", "moonLamp"],
     tasks: [
       { id: "mutatedHarvest", label: "Harvest 2 lunar or mutated fruits", target: 2, reward: 46 },
       { id: "sell", label: "Sell during Blood Moon", target: 1, reward: 30 }
@@ -509,6 +634,7 @@ const events = [
     saleMultiplier: 1.1,
     mutation: "galactic",
     mutationChance: 0.14,
+    exclusiveShop: ["cometSeed", "starCrate"],
     tasks: [
       { id: "mutatedHarvest", label: "Harvest 2 galactic fruits", target: 2, reward: 60 },
       { id: "water", label: "Water 8 crops", target: 8, reward: 26 }
@@ -525,7 +651,7 @@ const plot = {
 };
 
 const defaultState = {
-  coins: 18,
+  coins: 150,
   eventCoins: 0,
   startedAt: Date.now(),
   selectedSlot: 0,
@@ -540,14 +666,16 @@ const defaultState = {
   taskProgress: {},
   claimedTasks: {},
   inventory: {},
-  seedBag: {},
+  seedBag: { carrot: 2, berry: 1, tomato: 1 },
   gearBag: {},
   ownedPets: [],
   equippedPet: null,
+  ownedCosmetics: [],
+  equippedCosmetic: null,
   hotbar: [
     { type: "seed", id: "carrot" },
     { type: "seed", id: "berry" },
-    { type: "gear", id: "wateringCan" },
+    { type: "seed", id: "tomato" },
     { type: "gear", id: "fertilizer" },
     { type: "gear", id: "harvestGlove" },
     null,
@@ -592,7 +720,9 @@ function loadState() {
       claimedTasks: { ...(saved.claimedTasks || {}) },
       hotbar: Array.isArray(saved.hotbar) ? saved.hotbar.slice(0, 8) : base.hotbar,
       cells: Array.isArray(saved.cells) ? saved.cells.slice(0, plot.cols * plot.rows) : base.cells,
-      ownedPets: Array.isArray(saved.ownedPets) ? saved.ownedPets : []
+      ownedPets: Array.isArray(saved.ownedPets) ? saved.ownedPets : [],
+      ownedCosmetics: Array.isArray(saved.ownedCosmetics) ? saved.ownedCosmetics : [],
+      equippedCosmetic: saved.equippedCosmetic || null
     };
     while (merged.hotbar.length < 8) merged.hotbar.push(null);
     while (merged.cells.length < plot.cols * plot.rows) merged.cells.push(null);
@@ -620,6 +750,8 @@ function saveState() {
     gearBag: state.gearBag,
     ownedPets: state.ownedPets,
     equippedPet: state.equippedPet,
+    ownedCosmetics: state.ownedCosmetics,
+    equippedCosmetic: state.equippedCosmetic,
     hotbar: state.hotbar,
     cells: state.cells
   };
@@ -785,6 +917,14 @@ function rollMutation() {
   return "normal";
 }
 
+function seedDefaultMutation(seedId) {
+  if (seedId === "honeySprout") return "honeyed";
+  if (seedId === "discoSeed") return "disco";
+  if (seedId === "nightSeed") return "lunar";
+  if (seedId === "cometSeed") return "galactic";
+  return rollMutation();
+}
+
 function countBagItem(type, id) {
   return type === "seed" ? state.seedBag[id] || 0 : state.gearBag[id] || 0;
 }
@@ -807,7 +947,18 @@ function buyPrice(item) {
 }
 
 function canShowEventItem(item) {
-  return !item.eventOnly || item.eventOnly === currentEvent().id;
+  return !item.eventOnly;
+}
+
+function exclusiveData(exclusive) {
+  if (exclusive.type === "seed") return seeds[exclusive.itemId];
+  if (exclusive.type === "gear") return gear[exclusive.itemId];
+  return exclusive;
+}
+
+function ownedExclusive(exclusive) {
+  if (exclusive.type === "cosmetic") return state.ownedCosmetics.includes(exclusive.id);
+  return false;
 }
 
 function addToHotbar(type, id) {
@@ -867,6 +1018,52 @@ function buyPet(id) {
   state.ownedPets.push(id);
   state.equippedPet = id;
   setStatus(`${pet.name} joined your garden.`);
+  saveState();
+  renderUi();
+}
+
+function hatchEgg(exclusive) {
+  const options = exclusive.hatchPets;
+  const petId = options[Math.floor(Math.random() * options.length)];
+  const pet = pets[petId];
+  if (!state.ownedPets.includes(petId)) {
+    state.ownedPets.push(petId);
+  }
+  state.equippedPet = petId;
+  setStatus(`${exclusive.name} hatched into ${pet.name}.`);
+}
+
+function buyExclusive(id) {
+  const exclusive = exclusiveItems[id];
+  if (!exclusive || exclusive.event !== currentEvent().id) {
+    setStatus("That exclusive is not available right now.");
+    return;
+  }
+  if (state.eventCoins < exclusive.cost) {
+    setStatus(`Earn more ${eventCurrencyName()} from this event.`);
+    return;
+  }
+
+  state.eventCoins -= exclusive.cost;
+  if (exclusive.type === "seed") {
+    state.seedBag[exclusive.itemId] = (state.seedBag[exclusive.itemId] || 0) + 1;
+    addToHotbar("seed", exclusive.itemId);
+    setStatus(`${seeds[exclusive.itemId].name} added to your hotbar.`);
+  } else if (exclusive.type === "gear") {
+    const item = gear[exclusive.itemId];
+    state.gearBag[exclusive.itemId] = (state.gearBag[exclusive.itemId] || 0) + item.uses;
+    addToHotbar("gear", exclusive.itemId);
+    setStatus(`${item.name} added to your hotbar.`);
+  } else if (exclusive.type === "egg") {
+    hatchEgg(exclusive);
+  } else if (exclusive.type === "cosmetic") {
+    if (!state.ownedCosmetics.includes(exclusive.id)) {
+      state.ownedCosmetics.push(exclusive.id);
+    }
+    state.equippedCosmetic = state.equippedCosmetic === exclusive.id ? null : exclusive.id;
+    setStatus(state.equippedCosmetic ? `${exclusive.name} equipped.` : `${exclusive.name} unequipped.`);
+  }
+
   saveState();
   renderUi();
 }
@@ -1078,7 +1275,7 @@ function plantSeed(id, index) {
   }
   state.cells[index] = {
     seedId: id,
-    mutation: rollMutation(),
+    mutation: seedDefaultMutation(id),
     progress: 0,
     growTime: seed.growTime,
     watered: 0,
@@ -1266,6 +1463,50 @@ function renderTasks() {
   });
 }
 
+function renderExclusiveShop() {
+  const event = currentEvent();
+  ui.exclusiveShopList.innerHTML = "";
+  (event.exclusiveShop || []).forEach((id) => {
+    const exclusive = exclusiveItems[id];
+    if (!exclusive) return;
+    const data = exclusiveData(exclusive);
+    const row = document.createElement("div");
+    row.className = "shop-item";
+
+    const icon = document.createElement("div");
+    icon.className = "shop-icon";
+    if (exclusive.type === "seed" || exclusive.type === "gear") {
+      drawIcon(icon, data, exclusive.type);
+    } else {
+      icon.style.background = data.color;
+      icon.style.display = "grid";
+      icon.style.placeItems = "center";
+      icon.style.color = "#10150f";
+      icon.style.fontWeight = "900";
+      icon.textContent = exclusive.type === "egg" ? "EG" : "FX";
+    }
+
+    const meta = exclusive.type === "seed"
+      ? `${data.growTime}s grow, ${data.value} value`
+      : exclusive.type === "gear"
+        ? data.description
+        : data.description;
+    const text = document.createElement("div");
+    text.innerHTML = `<div class="item-name">${data.name}</div><div class="item-meta">${meta}</div>`;
+
+    const button = document.createElement("button");
+    button.className = "buy-button";
+    button.type = "button";
+    const owned = ownedExclusive(exclusive);
+    button.textContent = owned ? (state.equippedCosmetic === exclusive.id ? "On" : "Equip") : `${exclusive.cost}${eventCurrencyName()[0]}`;
+    button.disabled = !owned && state.eventCoins < exclusive.cost;
+    button.addEventListener("click", () => buyExclusive(exclusive.id));
+
+    row.append(icon, text, button);
+    ui.exclusiveShopList.appendChild(row);
+  });
+}
+
 function renderShop() {
   const source = state.shopTab === "seeds" ? seeds : gear;
   ui.shopList.innerHTML = "";
@@ -1390,6 +1631,7 @@ function renderUi() {
   ui.sellButton.disabled = cropValue() <= 0;
   ui.quickSellButton.disabled = cropValue() <= 0;
   renderTasks();
+  renderExclusiveShop();
   renderShop();
   renderPets();
   renderInventory();
@@ -1588,6 +1830,58 @@ function drawGarden(time) {
     ctx.textAlign = "center";
     ctx.fillText(pet.mark, 55 + Math.sin(time / 600) * 6, canvas.height - 44);
     ctx.textAlign = "left";
+  }
+
+  if (state.equippedCosmetic === "discoBall") {
+    const cx = canvas.width - 72;
+    const cy = canvas.height - 78;
+    const hue = (time / 10) % 360;
+    ctx.fillStyle = `hsl(${hue}, 88%, 64%)`;
+    ctx.beginPath();
+    ctx.arc(cx, cy, 24, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = "rgba(255,255,255,0.65)";
+    ctx.lineWidth = 2;
+    for (let i = -2; i <= 2; i += 1) {
+      ctx.beginPath();
+      ctx.moveTo(cx - 24, cy + i * 8);
+      ctx.lineTo(cx + 24, cy + i * 8);
+      ctx.stroke();
+    }
+    ctx.strokeStyle = `hsla(${(hue + 120) % 360}, 90%, 70%, 0.45)`;
+    ctx.lineWidth = 5;
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.lineTo(cx - 95, cy - 38);
+    ctx.moveTo(cx, cy);
+    ctx.lineTo(cx - 74, cy + 48);
+    ctx.stroke();
+  }
+
+  if (state.equippedCosmetic === "moonLamp") {
+    ctx.fillStyle = "#aeb8ff";
+    ctx.beginPath();
+    ctx.arc(canvas.width - 70, canvas.height - 82, 22, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = event.sky;
+    ctx.beginPath();
+    ctx.arc(canvas.width - 58, canvas.height - 91, 20, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = "rgba(174, 184, 255, 0.5)";
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(canvas.width - 70, canvas.height - 58);
+    ctx.lineTo(canvas.width - 70, canvas.height - 22);
+    ctx.stroke();
+  }
+
+  if (state.equippedCosmetic === "lotusBell") {
+    ctx.fillStyle = "#e6a7ca";
+    ctx.beginPath();
+    ctx.ellipse(canvas.width - 78, canvas.height - 44, 26, 12, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = "#f4f1e8";
+    drawStar(canvas.width - 78, canvas.height - 62, 13, 6);
   }
 
   ctx.fillStyle = "rgba(0,0,0,0.36)";
