@@ -8,17 +8,20 @@ const ctx = canvas.getContext("2d");
 const ui = {
   coins: document.getElementById("coinText"),
   eventCoins: document.getElementById("eventCoinText"),
+  eventCoinLabel: document.getElementById("eventCoinLabel"),
   cropValue: document.getElementById("valueText"),
   day: document.getElementById("dayText"),
   status: document.getElementById("statusText"),
   eventTimer: document.getElementById("eventTimer"),
   eventName: document.getElementById("eventName"),
   eventDescription: document.getElementById("eventDescription"),
+  eventTradeButton: document.getElementById("eventTradeButton"),
   taskList: document.getElementById("taskList"),
   shopList: document.getElementById("shopList"),
   inventoryList: document.getElementById("inventoryList"),
   petList: document.getElementById("petList"),
   hotbar: document.getElementById("hotbar"),
+  quickSellButton: document.getElementById("quickSellButton"),
   sellButton: document.getElementById("sellButton"),
   restockButton: document.getElementById("restockButton"),
   resetButton: document.getElementById("resetButton")
@@ -180,7 +183,52 @@ const gear = {
     uses: 4,
     color: "#91a7ff",
     description: "Turns one harvested fruit into matching seeds."
+  },
+  honeyGlazer: {
+    id: "honeyGlazer",
+    kind: "gear",
+    name: "Honey Glazer",
+    cost: 90,
+    uses: 6,
+    eventOnly: "honey",
+    currency: "event",
+    color: "#f0bd45",
+    description: "Coats one crop for extra sell value."
+  },
+  snowLantern: {
+    id: "snowLantern",
+    kind: "gear",
+    name: "Snow Lantern",
+    cost: 110,
+    uses: 5,
+    eventOnly: "christmas",
+    currency: "event",
+    color: "#cce8f2",
+    description: "Instantly chills a patch with growth magic."
+  },
+  zenRake: {
+    id: "zenRake",
+    kind: "gear",
+    name: "Zen Rake",
+    cost: 130,
+    uses: 5,
+    eventOnly: "zen",
+    currency: "event",
+    color: "#d4c9a1",
+    description: "Balances every crop to at least half grown."
   }
+};
+
+const mutations = {
+  normal: { id: "normal", name: "", multiplier: 1, color: null },
+  golden: { id: "golden", name: "Golden", multiplier: 2.1, color: "#ffd45c" },
+  giant: { id: "giant", name: "Giant", multiplier: 1.75, color: "#9dd05c" },
+  honeyed: { id: "honeyed", name: "Honeyed", multiplier: 2.4, color: "#f0bd45" },
+  frozen: { id: "frozen", name: "Frozen", multiplier: 2.2, color: "#b9e7ff" },
+  zen: { id: "zen", name: "Zen", multiplier: 2.6, color: "#e6a7ca" },
+  disco: { id: "disco", name: "Disco", multiplier: 3.2, color: "#ff6bd6" },
+  lunar: { id: "lunar", name: "Lunar", multiplier: 3.6, color: "#aeb8ff" },
+  galactic: { id: "galactic", name: "Galactic", multiplier: 4.5, color: "#81d8e8" }
 };
 
 const pets = {
@@ -239,6 +287,33 @@ const pets = {
     mark: "SP",
     color: "#f08732",
     description: "Ready crops gain 20% extra sell value."
+  },
+  queenBee: {
+    id: "queenBee",
+    name: "Queen Bee",
+    cost: 240,
+    eventOnly: "honey",
+    mark: "QB",
+    color: "#ffd45c",
+    description: "Fruit turn-ins earn 35% more event currency."
+  },
+  snowSprite: {
+    id: "snowSprite",
+    name: "Snow Sprite",
+    cost: 260,
+    eventOnly: "christmas",
+    mark: "SS",
+    color: "#b9e7ff",
+    description: "Restocks add one random seed."
+  },
+  lotusSpirit: {
+    id: "lotusSpirit",
+    name: "Lotus Spirit",
+    cost: 300,
+    eventOnly: "zen",
+    mark: "LS",
+    color: "#e6a7ca",
+    description: "All task progress has a chance to count twice."
   }
 };
 
@@ -345,6 +420,99 @@ const events = [
       { id: "plant", label: "Plant 10 seeds", target: 10, reward: 28 },
       { id: "water", label: "Water 5 crops", target: 5, reward: 18 }
     ]
+  },
+  {
+    id: "honey",
+    name: "Honey Harvest",
+    description: "Turn in fruits for honey. Honey buys exclusive bee gear and pets.",
+    sky: "#66552d",
+    growthMultiplier: 1.05,
+    saleMultiplier: 1,
+    mutation: "honeyed",
+    mutationChance: 0.3,
+    currencyLabel: "honey",
+    turnInLabel: "Turn In Fruit for Honey",
+    turnInRate: 16,
+    tasks: [
+      { id: "turnIn", label: "Turn in fruit twice", target: 2, reward: 32 },
+      { id: "harvest", label: "Harvest 8 fruits", target: 8, reward: 24 }
+    ]
+  },
+  {
+    id: "christmas",
+    name: "Christmas Garden",
+    description: "Turn in fruits for snowflakes and buy winter rewards.",
+    sky: "#4d6470",
+    growthMultiplier: 0.95,
+    saleMultiplier: 1.2,
+    mutation: "frozen",
+    mutationChance: 0.28,
+    currencyLabel: "snowflakes",
+    turnInLabel: "Wrap Fruit Gifts",
+    turnInRate: 18,
+    tasks: [
+      { id: "turnIn", label: "Wrap 3 fruit gifts", target: 3, reward: 36 },
+      { id: "buy", label: "Buy 3 shop items", target: 3, reward: 22 }
+    ]
+  },
+  {
+    id: "zen",
+    name: "Zen Garden",
+    description: "Turn in fruit offerings for chi and unlock calm garden boosts.",
+    sky: "#56664f",
+    growthMultiplier: 1.25,
+    saleMultiplier: 1,
+    mutation: "zen",
+    mutationChance: 0.24,
+    currencyLabel: "chi",
+    turnInLabel: "Offer Fruit for Chi",
+    turnInRate: 20,
+    tasks: [
+      { id: "turnIn", label: "Make 2 fruit offerings", target: 2, reward: 34 },
+      { id: "plant", label: "Plant 7 seeds", target: 7, reward: 21 }
+    ]
+  },
+  {
+    id: "disco",
+    name: "Disco Fever",
+    description: "Crops can become Disco mutations worth huge money. Everything pulses.",
+    sky: "#412f5f",
+    growthMultiplier: 1.4,
+    saleMultiplier: 1,
+    mutation: "disco",
+    mutationChance: 0.2,
+    tasks: [
+      { id: "mutatedHarvest", label: "Harvest 3 mutated fruits", target: 3, reward: 42 },
+      { id: "plant", label: "Plant 9 seeds", target: 9, reward: 24 }
+    ]
+  },
+  {
+    id: "bloodMoon",
+    name: "Blood Moon",
+    description: "Slow, rare, and valuable. Lunar crops can appear under the red sky.",
+    sky: "#54272b",
+    growthMultiplier: 0.8,
+    saleMultiplier: 1.35,
+    mutation: "lunar",
+    mutationChance: 0.18,
+    tasks: [
+      { id: "mutatedHarvest", label: "Harvest 2 lunar or mutated fruits", target: 2, reward: 46 },
+      { id: "sell", label: "Sell during Blood Moon", target: 1, reward: 30 }
+    ]
+  },
+  {
+    id: "galaxy",
+    name: "Galaxy Shower",
+    description: "Starfalls can create Galactic crops, the most valuable mutation.",
+    sky: "#29385d",
+    growthMultiplier: 1.15,
+    saleMultiplier: 1.1,
+    mutation: "galactic",
+    mutationChance: 0.14,
+    tasks: [
+      { id: "mutatedHarvest", label: "Harvest 2 galactic fruits", target: 2, reward: 60 },
+      { id: "water", label: "Water 8 crops", target: 8, reward: 26 }
+    ]
   }
 ];
 
@@ -357,7 +525,7 @@ const plot = {
 };
 
 const defaultState = {
-  coins: 125,
+  coins: 18,
   eventCoins: 0,
   startedAt: Date.now(),
   selectedSlot: 0,
@@ -372,7 +540,7 @@ const defaultState = {
   taskProgress: {},
   claimedTasks: {},
   inventory: {},
-  seedBag: { carrot: 4, berry: 1 },
+  seedBag: {},
   gearBag: {},
   ownedPets: [],
   equippedPet: null,
@@ -527,10 +695,11 @@ function taskProgress(key) {
 function addTaskProgress(action, amount = 1) {
   const event = currentEvent();
   let changed = false;
+  const gained = state.equippedPet === "lotusSpirit" && Math.random() < 0.2 ? amount + 1 : amount;
   event.tasks.forEach((task) => {
     if (task.id !== action) return;
     const key = taskKey(event.id, task.id);
-    state.taskProgress[key] = Math.min(task.target, taskProgress(key) + amount);
+    state.taskProgress[key] = Math.min(task.target, taskProgress(key) + gained);
     changed = true;
   });
   if (changed) {
@@ -552,7 +721,8 @@ function claimTask(eventId, task) {
 
 function cropValue() {
   return Object.entries(state.inventory).reduce((sum, [id, count]) => {
-    return seeds[id] ? sum + seeds[id].value * count : sum;
+    const fruit = parseFruitKey(id);
+    return fruit.seed ? sum + fruit.seed.value * fruit.mutation.multiplier * count : sum;
   }, 0);
 }
 
@@ -560,13 +730,59 @@ function sellMultiplier() {
   return currentEvent().saleMultiplier * saleBonus();
 }
 
+function eventCurrencyName() {
+  return currentEvent().currencyLabel || "petals";
+}
+
 function cropSellValue(id, count) {
   const event = currentEvent();
+  const fruit = parseFruitKey(id);
+  if (!fruit.seed) return 0;
   let multiplier = sellMultiplier();
-  if (event.premiumSeeds && event.premiumSeeds.includes(id)) {
+  if (event.premiumSeeds && event.premiumSeeds.includes(fruit.seedId)) {
     multiplier *= event.premiumMultiplier || 1;
   }
-  return Math.round(seeds[id].value * count * multiplier);
+  return Math.round(fruit.seed.value * fruit.mutation.multiplier * count * multiplier);
+}
+
+function fruitKey(seedId, mutationId = "normal") {
+  return mutationId && mutationId !== "normal" ? `${seedId}:${mutationId}` : seedId;
+}
+
+function parseFruitKey(key) {
+  const [seedId, mutationId = "normal"] = key.split(":");
+  return {
+    seedId,
+    mutationId,
+    seed: seeds[seedId],
+    mutation: mutations[mutationId] || mutations.normal
+  };
+}
+
+function fruitName(seedId, mutationId = "normal") {
+  const seed = seeds[seedId];
+  const mutation = mutations[mutationId] || mutations.normal;
+  return `${mutation.name ? `${mutation.name} ` : ""}${seed.crop}`;
+}
+
+function addFruitFromPlant(plant) {
+  const mutationId = plant.mutation || "normal";
+  const key = fruitKey(plant.seedId, mutationId);
+  state.inventory[key] = (state.inventory[key] || 0) + (plant.glazed ? 2 : 1);
+  if (mutationId !== "normal") {
+    addTaskProgress("mutatedHarvest");
+  }
+}
+
+function rollMutation() {
+  const event = currentEvent();
+  if (event.mutation && Math.random() < event.mutationChance) {
+    return event.mutation;
+  }
+  const roll = Math.random();
+  if (roll < 0.025) return "golden";
+  if (roll < 0.055) return "giant";
+  return "normal";
 }
 
 function countBagItem(type, id) {
@@ -590,6 +806,10 @@ function buyPrice(item) {
   return item.cost;
 }
 
+function canShowEventItem(item) {
+  return !item.eventOnly || item.eventOnly === currentEvent().id;
+}
+
 function addToHotbar(type, id) {
   const existing = state.hotbar.findIndex((slot) => slot && slot.type === type && slot.id === id);
   if (existing >= 0) {
@@ -606,12 +826,18 @@ function addToHotbar(type, id) {
 function buy(type, id) {
   const data = type === "seed" ? seeds[id] : gear[id];
   const price = buyPrice(data);
-  if (state.coins < price) {
-    setStatus("Not enough coins.");
+  const useEventCurrency = data.currency === "event";
+  const wallet = useEventCurrency ? state.eventCoins : state.coins;
+  if (wallet < price) {
+    setStatus(useEventCurrency ? `Not enough ${currentEvent().currencyLabel || "petals"}.` : "Not enough coins.");
     return;
   }
 
-  state.coins -= price;
+  if (useEventCurrency) {
+    state.eventCoins -= price;
+  } else {
+    state.coins -= price;
+  }
   if (type === "seed") {
     state.seedBag[id] = (state.seedBag[id] || 0) + 1;
   } else {
@@ -634,7 +860,7 @@ function buyPet(id) {
     return;
   }
   if (state.eventCoins < pet.cost) {
-    setStatus("Earn more petals from event tasks.");
+    setStatus(`Earn more ${eventCurrencyName()} from event tasks.`);
     return;
   }
   state.eventCoins -= pet.cost;
@@ -645,15 +871,34 @@ function buyPet(id) {
   renderUi();
 }
 
+function turnInFruitForEventCurrency() {
+  const event = currentEvent();
+  if (!event.turnInRate) {
+    setStatus("This event has tasks instead of fruit turn-ins.");
+    return;
+  }
+  const base = cropValue();
+  if (base <= 0) {
+    setStatus("Harvest fruit before turning it in.");
+    return;
+  }
+  const bonus = state.equippedPet === "queenBee" ? 1.35 : 1;
+  const earned = Math.max(1, Math.round((base / event.turnInRate) * bonus));
+  state.inventory = {};
+  state.eventCoins += earned;
+  addTaskProgress("turnIn");
+  setStatus(`Turned in fruit for ${earned} ${eventCurrencyName()}.`);
+  saveState();
+  renderUi();
+}
+
 function sellAll() {
   const base = cropValue();
   if (base <= 0) {
     setStatus("Harvest crops before selling.");
     return;
   }
-  const total = Object.entries(state.inventory).reduce((sum, [id, count]) => {
-    return seeds[id] ? sum + cropSellValue(id, count) : sum;
-  }, 0);
+  const total = Object.entries(state.inventory).reduce((sum, [id, count]) => sum + cropSellValue(id, count), 0);
   state.coins += total;
   state.inventory = {};
   addTaskProgress("sell");
@@ -669,6 +914,11 @@ function restock() {
   }
   state.seedBag.carrot = (state.seedBag.carrot || 0) + 2;
   state.seedBag.berry = (state.seedBag.berry || 0) + 1;
+  if (state.equippedPet === "snowSprite") {
+    const ids = Object.keys(seeds);
+    const id = ids[Math.floor(Math.random() * ids.length)];
+    state.seedBag[id] = (state.seedBag[id] || 0) + 1;
+  }
   state.coins -= 10;
   addToHotbar("seed", "carrot");
   setStatus("The seed shelf restocked.");
@@ -728,6 +978,24 @@ function useGear(id, index) {
     }
   }
 
+  if (id === "honeyGlazer") {
+    plant.glazed = true;
+    plant.progress = Math.min(plant.growTime, plant.progress + plant.growTime * 0.22);
+    setStatus("Honey glaze added extra value to that crop.");
+  }
+
+  if (id === "snowLantern") {
+    chillArea(index);
+    setStatus("Snow lantern chilled the patch forward.");
+  }
+
+  if (id === "zenRake") {
+    state.cells.forEach((crop) => {
+      if (crop) crop.progress = Math.max(crop.progress, crop.growTime * 0.5);
+    });
+    setStatus("Zen rake balanced the garden.");
+  }
+
   state.gearBag[id] -= 1;
   saveState();
   renderUi();
@@ -764,12 +1032,28 @@ function boostAllCrops() {
   }
 }
 
+function chillArea(index) {
+  const col = index % plot.cols;
+  const row = Math.floor(index / plot.cols);
+  for (let y = row - 1; y <= row + 1; y += 1) {
+    for (let x = col - 1; x <= col + 1; x += 1) {
+      if (x < 0 || y < 0 || x >= plot.cols || y >= plot.rows) continue;
+      const plant = state.cells[y * plot.cols + x];
+      if (plant) {
+        plant.progress = Math.min(plant.growTime, plant.progress + plant.growTime * 0.3);
+        plant.watered = 18;
+      }
+    }
+  }
+}
+
 function scanFruitForSeeds(seedId) {
-  if ((state.inventory[seedId] || 0) <= 0) {
+  const key = Object.keys(state.inventory).find((itemKey) => parseFruitKey(itemKey).seedId === seedId && state.inventory[itemKey] > 0);
+  if (!key) {
     setStatus("Harvest that fruit before scanning it.");
     return false;
   }
-  state.inventory[seedId] -= 1;
+  state.inventory[key] -= 1;
   state.seedBag[seedId] = (state.seedBag[seedId] || 0) + 3;
   addToHotbar("seed", seedId);
   setStatus(`Scanner converted one ${seeds[seedId].crop} into 3 seeds.`);
@@ -794,6 +1078,7 @@ function plantSeed(id, index) {
   }
   state.cells[index] = {
     seedId: id,
+    mutation: rollMutation(),
     progress: 0,
     growTime: seed.growTime,
     watered: 0,
@@ -801,9 +1086,12 @@ function plantSeed(id, index) {
     sway: Math.random() * Math.PI * 2
   };
   addTaskProgress("plant");
+  const planted = state.cells[index];
   if (currentEvent().plantingPetalChance && Math.random() < currentEvent().plantingPetalChance) {
     state.eventCoins += 3;
     setStatus(`${seed.name} planted. Lucky bug found 3 petals.`);
+  } else if (planted.mutation && planted.mutation !== "normal") {
+    setStatus(`${mutations[planted.mutation].name} ${seed.name} mutation sprouted.`);
   } else if (state.messageTime <= 0) {
     setStatus(`${seed.name} planted.`);
   }
@@ -818,13 +1106,13 @@ function harvestCell(index) {
     setStatus("That crop is still growing.");
     return false;
   }
-  state.inventory[plant.seedId] = (state.inventory[plant.seedId] || 0) + 1;
+  addFruitFromPlant(plant);
   state.cells[index] = null;
   addTaskProgress("harvest");
   if (currentEvent().premiumSeeds && currentEvent().premiumSeeds.includes(plant.seedId)) {
     addTaskProgress("premiumHarvest");
   }
-  setStatus(`${seeds[plant.seedId].crop} harvested.`);
+  setStatus(`${fruitName(plant.seedId, plant.mutation)} harvested.`);
   saveState();
   renderUi();
   return true;
@@ -840,7 +1128,7 @@ function harvestArea(index) {
       const i = y * plot.cols + x;
       const plant = state.cells[i];
       if (plant && plant.progress >= plant.growTime) {
-        state.inventory[plant.seedId] = (state.inventory[plant.seedId] || 0) + 1;
+        addFruitFromPlant(plant);
         state.cells[i] = null;
         harvested += 1;
         if (currentEvent().premiumSeeds && currentEvent().premiumSeeds.includes(plant.seedId)) {
@@ -917,6 +1205,23 @@ function drawRoundedRect(x, y, w, h, r) {
   ctx.closePath();
 }
 
+function drawStar(cx, cy, outer, inner) {
+  ctx.beginPath();
+  for (let i = 0; i < 10; i += 1) {
+    const angle = -Math.PI / 2 + (i * Math.PI) / 5;
+    const radius = i % 2 === 0 ? outer : inner;
+    const x = cx + Math.cos(angle) * radius;
+    const y = cy + Math.sin(angle) * radius;
+    if (i === 0) {
+      ctx.moveTo(x, y);
+    } else {
+      ctx.lineTo(x, y);
+    }
+  }
+  ctx.closePath();
+  ctx.fill();
+}
+
 function drawIcon(target, data, type) {
   target.style.background = data.color;
   target.innerHTML = "";
@@ -964,7 +1269,7 @@ function renderTasks() {
 function renderShop() {
   const source = state.shopTab === "seeds" ? seeds : gear;
   ui.shopList.innerHTML = "";
-  Object.values(source).forEach((data) => {
+  Object.values(source).filter(canShowEventItem).forEach((data) => {
     const row = document.createElement("div");
     row.className = "shop-item";
 
@@ -978,8 +1283,8 @@ function renderShop() {
     const button = document.createElement("button");
     button.className = "buy-button";
     button.type = "button";
-    button.textContent = `${buyPrice(data)}c`;
-    button.disabled = state.coins < buyPrice(data);
+    button.textContent = data.currency === "event" ? `${buyPrice(data)}${eventCurrencyName()[0]}` : `${buyPrice(data)}c`;
+    button.disabled = data.currency === "event" ? state.eventCoins < buyPrice(data) : state.coins < buyPrice(data);
     button.addEventListener("click", () => buy(state.shopTab === "seeds" ? "seed" : "gear", data.id));
 
     row.append(icon, text, button);
@@ -989,7 +1294,7 @@ function renderShop() {
 
 function renderPets() {
   ui.petList.innerHTML = "";
-  Object.values(pets).forEach((pet) => {
+  Object.values(pets).filter((pet) => !pet.eventOnly || pet.eventOnly === currentEvent().id || state.ownedPets.includes(pet.id)).forEach((pet) => {
     const owned = state.ownedPets.includes(pet.id);
     const equipped = state.equippedPet === pet.id;
     const row = document.createElement("div");
@@ -1007,7 +1312,7 @@ function renderPets() {
     const button = document.createElement("button");
     button.className = "buy-button";
     button.type = "button";
-    button.textContent = owned ? (equipped ? "Rest" : "Equip") : `${pet.cost}p`;
+    button.textContent = owned ? (equipped ? "Rest" : "Equip") : `${pet.cost}${eventCurrencyName()[0]}`;
     button.disabled = !owned && state.eventCoins < pet.cost;
     button.addEventListener("click", () => buyPet(pet.id));
 
@@ -1018,7 +1323,7 @@ function renderPets() {
 
 function renderInventory() {
   ui.inventoryList.innerHTML = "";
-  const entries = Object.entries(state.inventory).filter((entry) => entry[1] > 0 && seeds[entry[0]]);
+  const entries = Object.entries(state.inventory).filter((entry) => entry[1] > 0 && parseFruitKey(entry[0]).seed);
   if (!entries.length) {
     const empty = document.createElement("div");
     empty.className = "inventory-item";
@@ -1028,7 +1333,8 @@ function renderInventory() {
   }
 
   entries.forEach(([id, count]) => {
-    const data = seeds[id];
+    const fruit = parseFruitKey(id);
+    const data = fruit.seed;
     const row = document.createElement("div");
     row.className = "inventory-item";
     const icon = document.createElement("div");
@@ -1036,7 +1342,7 @@ function renderInventory() {
     drawIcon(icon, data, "seed");
     const value = cropSellValue(id, count);
     row.append(icon);
-    row.insertAdjacentHTML("beforeend", `<div><div class="item-name">${data.crop} x${count}</div><div class="item-meta">Worth ${value} coins now</div></div>`);
+    row.insertAdjacentHTML("beforeend", `<div><div class="item-name">${fruitName(fruit.seedId, fruit.mutationId)} x${count}</div><div class="item-meta">Worth ${value} coins now</div></div>`);
     ui.inventoryList.appendChild(row);
   });
 }
@@ -1070,14 +1376,19 @@ function renderHotbar() {
 
 function renderUi() {
   const event = currentEvent();
+  renderedEventSlot = state.eventSlot;
   ui.coins.textContent = state.coins;
   ui.eventCoins.textContent = state.eventCoins;
+  ui.eventCoinLabel.textContent = eventCurrencyName();
   ui.cropValue.textContent = Math.round(cropValue() * sellMultiplier());
   ui.day.textContent = `Day ${1 + Math.floor((Date.now() - state.startedAt) / 90000)}`;
   ui.eventName.textContent = event.name;
   ui.eventDescription.textContent = event.description;
+  ui.eventTradeButton.textContent = event.turnInLabel || "No Fruit Trade";
+  ui.eventTradeButton.disabled = !event.turnInRate || cropValue() <= 0;
   ui.eventTimer.textContent = formatTime(state.eventDuration - (Date.now() - state.eventStartedAt));
   ui.sellButton.disabled = cropValue() <= 0;
+  ui.quickSellButton.disabled = cropValue() <= 0;
   renderTasks();
   renderShop();
   renderPets();
@@ -1126,6 +1437,65 @@ function drawGarden(time) {
     ctx.fill();
   }
 
+  if (event.id === "honey") {
+    ctx.fillStyle = "rgba(240, 189, 69, 0.18)";
+    for (let i = 0; i < 8; i += 1) {
+      ctx.beginPath();
+      ctx.arc(90 + i * 108, 64 + Math.sin(time / 500 + i) * 12, 10, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+
+  if (event.id === "christmas") {
+    ctx.fillStyle = "rgba(245, 250, 255, 0.65)";
+    for (let i = 0; i < 36; i += 1) {
+      ctx.beginPath();
+      ctx.arc((i * 73 + time / 20) % canvas.width, (i * 41 + time / 12) % canvas.height, 2, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+
+  if (event.id === "zen") {
+    ctx.strokeStyle = "rgba(212, 201, 161, 0.22)";
+    ctx.lineWidth = 3;
+    for (let y = 95; y < canvas.height; y += 42) {
+      ctx.beginPath();
+      ctx.moveTo(0, y + Math.sin(time / 900 + y) * 4);
+      ctx.bezierCurveTo(240, y + 20, 520, y - 20, canvas.width, y);
+      ctx.stroke();
+    }
+  }
+
+  if (event.id === "disco") {
+    const hue = (time / 18) % 360;
+    ctx.fillStyle = `hsla(${hue}, 90%, 62%, 0.16)`;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    for (let i = 0; i < 10; i += 1) {
+      ctx.fillStyle = `hsla(${(hue + i * 36) % 360}, 90%, 64%, 0.38)`;
+      ctx.beginPath();
+      ctx.arc(60 + i * 94, 70 + Math.sin(time / 350 + i) * 18, 12, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+
+  if (event.id === "bloodMoon") {
+    ctx.fillStyle = "rgba(180, 45, 55, 0.24)";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = "#d85b61";
+    ctx.beginPath();
+    ctx.arc(canvas.width - 92, 78, 34, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  if (event.id === "galaxy") {
+    ctx.fillStyle = "rgba(129, 216, 232, 0.16)";
+    for (let i = 0; i < 42; i += 1) {
+      const x = (i * 61 + time / 25) % canvas.width;
+      const y = (i * 97) % canvas.height;
+      drawStar(x, y, 4, 2);
+    }
+  }
+
   ctx.strokeStyle = "rgba(255,255,255,0.08)";
   ctx.lineWidth = 1;
   for (let x = 0; x < canvas.width; x += 48) {
@@ -1154,6 +1524,7 @@ function drawGarden(time) {
 
       if (plant && seeds[plant.seedId]) {
         const data = seeds[plant.seedId];
+        const mutation = mutations[plant.mutation] || mutations.normal;
         const progress = plant.progress / plant.growTime;
         const cx = x + cellW / 2;
         const cy = y + cellH / 2;
@@ -1174,10 +1545,19 @@ function drawGarden(time) {
         ctx.quadraticCurveTo(cx - sway, cy - 3, cx + 12, cy - 12);
         ctx.stroke();
 
-        ctx.fillStyle = data.color;
+        ctx.fillStyle = mutation.color || data.color;
         ctx.beginPath();
-        ctx.arc(cx, cy + 10, radius, 0, Math.PI * 2);
+        ctx.arc(cx, cy + 10, plant.mutation === "giant" ? radius * 1.3 : radius, 0, Math.PI * 2);
         ctx.fill();
+        if (plant.mutation === "disco") {
+          ctx.strokeStyle = `hsl(${(time / 8) % 360}, 90%, 70%)`;
+          ctx.lineWidth = 4;
+          ctx.stroke();
+        }
+        if (plant.mutation === "galactic") {
+          ctx.fillStyle = "rgba(255,255,255,0.75)";
+          drawStar(cx + radius * 0.6, cy - radius * 0.3, 5, 2);
+        }
         ctx.fillStyle = "rgba(255,255,255,0.22)";
         ctx.beginPath();
         ctx.arc(cx - radius * 0.3, cy + 3, Math.max(2, radius * 0.18), 0, Math.PI * 2);
@@ -1187,6 +1567,11 @@ function drawGarden(time) {
           ctx.strokeStyle = "#f4f1e8";
           ctx.lineWidth = 3;
           ctx.strokeRect(x + 6, y + 6, cellW - 12, cellH - 12);
+          ctx.fillStyle = "#ffe45c";
+          drawStar(x + cellW - 18, y + 18, 13, 6);
+          ctx.strokeStyle = "rgba(0,0,0,0.42)";
+          ctx.lineWidth = 2;
+          ctx.stroke();
         }
       }
     }
@@ -1218,6 +1603,9 @@ function tick(now) {
   state.lastTime = now;
   updatePlants(dt);
   drawGarden(now);
+  if (state.eventSlot !== renderedEventSlot) {
+    renderUi();
+  }
 
   if (state.messageTime > 0) {
     state.messageTime -= dt;
@@ -1261,10 +1649,13 @@ document.querySelectorAll("[data-shop-tab]").forEach((button) => {
 });
 
 ui.sellButton.addEventListener("click", sellAll);
+ui.quickSellButton.addEventListener("click", sellAll);
 ui.restockButton.addEventListener("click", restock);
 ui.resetButton.addEventListener("click", resetProgress);
+ui.eventTradeButton.addEventListener("click", turnInFruitForEventCurrency);
 
 currentEvent();
+let renderedEventSlot = state.eventSlot;
 if (offlineReport && offlineReport.minutes > 0) {
   setStatus(`Welcome back. ${offlineReport.minutes} offline minutes grew ${offlineReport.matured} crops.`);
 }
