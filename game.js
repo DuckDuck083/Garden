@@ -653,6 +653,7 @@ const plot = {
 const defaultState = {
   coins: 150,
   eventCoins: 0,
+  devMode: false,
   startedAt: Date.now(),
   selectedSlot: 0,
   shopTab: "seeds",
@@ -738,6 +739,7 @@ function saveState() {
   const saveable = {
     coins: state.coins,
     eventCoins: state.eventCoins,
+    devMode: state.devMode,
     startedAt: state.startedAt,
     selectedSlot: state.selectedSlot,
     shopTab: state.shopTab,
@@ -979,12 +981,15 @@ function buy(type, id) {
   const price = buyPrice(data);
   const useEventCurrency = data.currency === "event";
   const wallet = useEventCurrency ? state.eventCoins : state.coins;
-  if (wallet < price) {
+  if (!state.devMode && wallet < price) {
     setStatus(useEventCurrency ? `Not enough ${currentEvent().currencyLabel || "petals"}.` : "Not enough coins.");
     return;
   }
 
-  if (useEventCurrency) {
+  if (state.devMode) {
+    state.coins = Math.max(state.coins, 999999);
+    state.eventCoins = Math.max(state.eventCoins, 999999);
+  } else if (useEventCurrency) {
     state.eventCoins -= price;
   } else {
     state.coins -= price;
@@ -1010,11 +1015,15 @@ function buyPet(id) {
     renderUi();
     return;
   }
-  if (state.eventCoins < pet.cost) {
+  if (!state.devMode && state.eventCoins < pet.cost) {
     setStatus(`Earn more ${eventCurrencyName()} from event tasks.`);
     return;
   }
-  state.eventCoins -= pet.cost;
+  if (state.devMode) {
+    state.eventCoins = Math.max(state.eventCoins, 999999);
+  } else {
+    state.eventCoins -= pet.cost;
+  }
   state.ownedPets.push(id);
   state.equippedPet = id;
   setStatus(`${pet.name} joined your garden.`);
@@ -1039,12 +1048,16 @@ function buyExclusive(id) {
     setStatus("That exclusive is not available right now.");
     return;
   }
-  if (state.eventCoins < exclusive.cost) {
+  if (!state.devMode && state.eventCoins < exclusive.cost) {
     setStatus(`Earn more ${eventCurrencyName()} from this event.`);
     return;
   }
 
-  state.eventCoins -= exclusive.cost;
+  if (state.devMode) {
+    state.eventCoins = Math.max(state.eventCoins, 999999);
+  } else {
+    state.eventCoins -= exclusive.cost;
+  }
   if (exclusive.type === "seed") {
     state.seedBag[exclusive.itemId] = (state.seedBag[exclusive.itemId] || 0) + 1;
     addToHotbar("seed", exclusive.itemId);
@@ -1105,7 +1118,7 @@ function sellAll() {
 }
 
 function restock() {
-  if (state.coins < 10) {
+  if (!state.devMode && state.coins < 10) {
     setStatus("Restocking costs 10 coins.");
     return;
   }
@@ -1116,7 +1129,11 @@ function restock() {
     const id = ids[Math.floor(Math.random() * ids.length)];
     state.seedBag[id] = (state.seedBag[id] || 0) + 1;
   }
-  state.coins -= 10;
+  if (state.devMode) {
+    state.coins = Math.max(state.coins, 999999);
+  } else {
+    state.coins -= 10;
+  }
   addToHotbar("seed", "carrot");
   setStatus("The seed shelf restocked.");
   saveState();
@@ -1499,7 +1516,7 @@ function renderExclusiveShop() {
     button.type = "button";
     const owned = ownedExclusive(exclusive);
     button.textContent = owned ? (state.equippedCosmetic === exclusive.id ? "On" : "Equip") : `${exclusive.cost}${eventCurrencyName()[0]}`;
-    button.disabled = !owned && state.eventCoins < exclusive.cost;
+    button.disabled = !state.devMode && !owned && state.eventCoins < exclusive.cost;
     button.addEventListener("click", () => buyExclusive(exclusive.id));
 
     row.append(icon, text, button);
@@ -1525,7 +1542,7 @@ function renderShop() {
     button.className = "buy-button";
     button.type = "button";
     button.textContent = data.currency === "event" ? `${buyPrice(data)}${eventCurrencyName()[0]}` : `${buyPrice(data)}c`;
-    button.disabled = data.currency === "event" ? state.eventCoins < buyPrice(data) : state.coins < buyPrice(data);
+    button.disabled = !state.devMode && (data.currency === "event" ? state.eventCoins < buyPrice(data) : state.coins < buyPrice(data));
     button.addEventListener("click", () => buy(state.shopTab === "seeds" ? "seed" : "gear", data.id));
 
     row.append(icon, text, button);
@@ -1554,7 +1571,7 @@ function renderPets() {
     button.className = "buy-button";
     button.type = "button";
     button.textContent = owned ? (equipped ? "Rest" : "Equip") : `${pet.cost}${eventCurrencyName()[0]}`;
-    button.disabled = !owned && state.eventCoins < pet.cost;
+    button.disabled = !state.devMode && !owned && state.eventCoins < pet.cost;
     button.addEventListener("click", () => buyPet(pet.id));
 
     row.append(icon, text, button);
@@ -1618,8 +1635,8 @@ function renderHotbar() {
 function renderUi() {
   const event = currentEvent();
   renderedEventSlot = state.eventSlot;
-  ui.coins.textContent = state.coins;
-  ui.eventCoins.textContent = state.eventCoins;
+  ui.coins.textContent = state.devMode ? "∞" : state.coins;
+  ui.eventCoins.textContent = state.devMode ? "∞" : state.eventCoins;
   ui.eventCoinLabel.textContent = eventCurrencyName();
   ui.cropValue.textContent = Math.round(cropValue() * sellMultiplier());
   ui.day.textContent = `Day ${1 + Math.floor((Date.now() - state.startedAt) / 90000)}`;
@@ -1925,6 +1942,22 @@ window.addEventListener("keydown", (event) => {
     state.selectedSlot = number - 1;
     saveState();
     renderUi();
+    return;
+  }
+
+  if (event.key.length === 1) {
+    cheatBuffer = `${cheatBuffer}${event.key.toLowerCase()}`.slice(-12);
+    if (cheatBuffer === "mustardmango") {
+      state.devMode = !state.devMode;
+      if (state.devMode) {
+        state.coins = Math.max(state.coins, 999999);
+        state.eventCoins = Math.max(state.eventCoins, 999999);
+      }
+      cheatBuffer = "";
+      setStatus(state.devMode ? "Dev mode enabled. Infinite coins and event currency." : "Dev mode disabled.");
+      saveState();
+      renderUi();
+    }
   }
 });
 
@@ -1950,6 +1983,7 @@ ui.eventTradeButton.addEventListener("click", turnInFruitForEventCurrency);
 
 currentEvent();
 let renderedEventSlot = state.eventSlot;
+let cheatBuffer = "";
 if (offlineReport && offlineReport.minutes > 0) {
   setStatus(`Welcome back. ${offlineReport.minutes} offline minutes grew ${offlineReport.matured} crops.`);
 }
