@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Grow Plot</title>
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <main class="app">
+      <section class="game-shell" aria-label="Garden simulator">
+        <header class="topbar">
+          <div>
+            <h1>Grow Plot</h1>
+            <p id="statusText">Choose a seed, then click soil to plant.</p>
+          </div>
+          <div class="meters" aria-label="Player resources">
+            <span><b id="coinText">125</b> coins</span>
+            <span><b id="eventCoinText">0</b> petals</span>
+            <span><b id="valueText">0</b> crop value</span>
+            <span><b id="dayText">Day 1</b></span>
+          </div>
+        </header>
+
+        <div class="play-area">
+          <canvas id="garden" width="960" height="640" aria-label="Bird's eye view garden plot"></canvas>
+
+          <aside class="panel">
+            <section class="event-card">
+              <div class="panel-heading">
+                <h2>Event</h2>
+                <span id="eventTimer">10:00</span>
+              </div>
+              <h3 id="eventName">Spring Drizzle</h3>
+              <p id="eventDescription">Crops grow faster while the rain lasts.</p>
+              <div id="taskList" class="task-list"></div>
+            </section>
+
+            <section>
+              <div class="panel-heading">
+                <h2>Shop</h2>
+                <button id="restockButton" type="button">Restock</button>
+              </div>
+              <div class="tabs" role="tablist" aria-label="Shop categories">
+                <button class="tab active" data-shop-tab="seeds" type="button">Seeds</button>
+                <button class="tab" data-shop-tab="gear" type="button">Gear</button>
+              </div>
+              <div id="shopList" class="shop-list"></div>
+            </section>
+
+            <section>
+              <div class="panel-heading">
+                <h2>Pets</h2>
+                <span id="petHint">Boost your garden</span>
+              </div>
+              <div id="petList" class="pet-list"></div>
+            </section>
+
+            <section>
+              <div class="panel-heading">
+                <h2>Harvest</h2>
+                <button id="sellButton" type="button">Sell All</button>
+              </div>
+              <div id="inventoryList" class="inventory-list"></div>
+            </section>
+
+            <section class="danger-zone">
+              <button id="resetButton" type="button">Reset Progress</button>
+            </section>
+          </aside>
+        </div>
+
+        <footer class="hotbar-wrap">
+          <div id="hotbar" class="hotbar" aria-label="Hotbar"></div>
+        </footer>
+      </section>
+    </main>
+
+    <script src="game.js"></script>
+  </body>
+</html>
