@@ -19,14 +19,17 @@
             <span><b id="eventCoinText">0</b> <span id="eventCoinLabel">petals</span></span>
             <span><b id="valueText">0</b> crop value</span>
             <span><b id="dayText">Day 1</b></span>
+            <span><b id="weatherText">Sunny</b> weather</span>
           </div>
           <button id="quickSellButton" class="quick-sell" type="button">Sell Harvest</button>
         </header>
 
+        <button id="shopToggleButton" class="shop-toggle" type="button">Shop</button>
+
         <div class="play-area">
           <canvas id="garden" width="960" height="640" aria-label="Bird's eye view garden plot"></canvas>
 
-          <aside class="panel">
+          <aside id="shopDrawer" class="panel shop-drawer open">
             <section class="event-card">
               <div class="panel-heading">
                 <h2>Event</h2>
@@ -44,6 +47,7 @@
                 <span id="exclusiveHint">Limited stock</span>
               </div>
               <div id="exclusiveShopList" class="shop-list exclusive-list"></div>
+              <div id="seedPackRoller" class="seed-pack-roller" aria-live="polite"></div>
             </section>
 
             <section>
@@ -56,6 +60,14 @@
                 <button class="tab" data-shop-tab="gear" type="button">Gear</button>
               </div>
               <div id="shopList" class="shop-list"></div>
+            </section>
+
+            <section>
+              <div class="panel-heading">
+                <h2>Plot</h2>
+                <button id="expandPlotButton" type="button">Expand</button>
+              </div>
+              <p id="plotSizeText" class="item-meta">Current plot: 5 x 4</p>
             </section>
 
             <section>
@@ -83,6 +95,23 @@
         <footer class="hotbar-wrap">
           <div id="hotbar" class="hotbar" aria-label="Hotbar"></div>
         </footer>
+      </section>
+      <div id="plantTooltip" class="plant-tooltip" aria-hidden="true"></div>
+      <section id="inventoryOverlay" class="inventory-overlay" aria-hidden="true">
+        <div class="inventory-modal">
+          <div class="panel-heading">
+            <div>
+              <h2>Inventory</h2>
+              <p id="inventoryHint">Click an item to put it in the selected hotbar slot.</p>
+            </div>
+            <button id="closeInventoryButton" type="button">Close</button>
+          </div>
+          <div class="inventory-tabs">
+            <button class="tab active" data-inventory-tab="seeds" type="button">Seeds</button>
+            <button class="tab" data-inventory-tab="gear" type="button">Gear</button>
+          </div>
+          <div id="itemInventoryList" class="item-inventory-list"></div>
+        </div>
       </section>
     </main>
 

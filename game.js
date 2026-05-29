@@ -11,6 +11,7 @@ const ui = {
   eventCoinLabel: document.getElementById("eventCoinLabel"),
   cropValue: document.getElementById("valueText"),
   day: document.getElementById("dayText"),
+  weather: document.getElementById("weatherText"),
   status: document.getElementById("statusText"),
   eventTimer: document.getElementById("eventTimer"),
   eventName: document.getElementById("eventName"),
@@ -18,14 +19,23 @@ const ui = {
   eventTradeButton: document.getElementById("eventTradeButton"),
   taskList: document.getElementById("taskList"),
   exclusiveShopList: document.getElementById("exclusiveShopList"),
+  seedPackRoller: document.getElementById("seedPackRoller"),
   shopList: document.getElementById("shopList"),
   inventoryList: document.getElementById("inventoryList"),
+  itemInventoryList: document.getElementById("itemInventoryList"),
+  inventoryOverlay: document.getElementById("inventoryOverlay"),
+  closeInventoryButton: document.getElementById("closeInventoryButton"),
   petList: document.getElementById("petList"),
   hotbar: document.getElementById("hotbar"),
+  plantTooltip: document.getElementById("plantTooltip"),
   quickSellButton: document.getElementById("quickSellButton"),
   sellButton: document.getElementById("sellButton"),
   restockButton: document.getElementById("restockButton"),
-  resetButton: document.getElementById("resetButton")
+  resetButton: document.getElementById("resetButton"),
+  shopToggleButton: document.getElementById("shopToggleButton"),
+  shopDrawer: document.getElementById("shopDrawer"),
+  expandPlotButton: document.getElementById("expandPlotButton"),
+  plotSize: document.getElementById("plotSizeText")
 };
 
 const seeds = {
@@ -179,6 +189,100 @@ const seeds = {
     currency: "event",
     color: "#81d8e8",
     leaf: "#f4f1e8"
+  },
+  everberry: {
+    id: "everberry",
+    kind: "seed",
+    name: "Everberry",
+    crop: "Everberries",
+    cost: 155,
+    value: 360,
+    growTime: 120,
+    eventOnly: "zen",
+    currency: "event",
+    regrow: true,
+    color: "#5bd17b",
+    leaf: "#d4c9a1"
+  },
+  sugarCane: {
+    id: "sugarCane",
+    kind: "seed",
+    name: "Sugar Cane",
+    crop: "Sugar Cane",
+    cost: 135,
+    value: 285,
+    growTime: 105,
+    eventOnly: "honey",
+    currency: "event",
+    regrow: true,
+    color: "#d8e885",
+    leaf: "#6dae5c"
+  },
+  nectarBloom: {
+    id: "nectarBloom",
+    kind: "seed",
+    name: "Nectar Bloom",
+    crop: "Nectar Blooms",
+    cost: 150,
+    value: 345,
+    growTime: 130,
+    eventOnly: "honey",
+    currency: "event",
+    color: "#ffcf6b",
+    leaf: "#78b85e"
+  },
+  mirrorMelon: {
+    id: "mirrorMelon",
+    kind: "seed",
+    name: "Mirror Melon",
+    crop: "Mirror Melons",
+    cost: 170,
+    value: 430,
+    growTime: 145,
+    eventOnly: "disco",
+    currency: "event",
+    color: "#65d7ff",
+    leaf: "#ff6bd6"
+  },
+  eclipsePepper: {
+    id: "eclipsePepper",
+    kind: "seed",
+    name: "Eclipse Pepper",
+    crop: "Eclipse Peppers",
+    cost: 185,
+    value: 520,
+    growTime: 160,
+    eventOnly: "bloodMoon",
+    currency: "event",
+    color: "#4d315d",
+    leaf: "#d85b61"
+  },
+  stardustBean: {
+    id: "stardustBean",
+    kind: "seed",
+    name: "Stardust Bean",
+    crop: "Stardust Beans",
+    cost: 210,
+    value: 650,
+    growTime: 180,
+    eventOnly: "galaxy",
+    currency: "event",
+    color: "#d7f6ff",
+    leaf: "#81d8e8"
+  },
+  bambooHeart: {
+    id: "bambooHeart",
+    kind: "seed",
+    name: "Bamboo Heart",
+    crop: "Bamboo Hearts",
+    cost: 180,
+    value: 470,
+    growTime: 150,
+    eventOnly: "zen",
+    currency: "event",
+    regrow: true,
+    color: "#8fd071",
+    leaf: "#d4c9a1"
   }
 };
 
@@ -274,21 +378,22 @@ const gear = {
 
 const mutations = {
   normal: { id: "normal", name: "", multiplier: 1, color: null },
-  golden: { id: "golden", name: "Golden", multiplier: 2.1, color: "#ffd45c" },
-  giant: { id: "giant", name: "Giant", multiplier: 1.75, color: "#9dd05c" },
-  honeyed: { id: "honeyed", name: "Honeyed", multiplier: 2.4, color: "#f0bd45" },
-  frozen: { id: "frozen", name: "Frozen", multiplier: 2.2, color: "#b9e7ff" },
-  zen: { id: "zen", name: "Zen", multiplier: 2.6, color: "#e6a7ca" },
-  disco: { id: "disco", name: "Disco", multiplier: 3.2, color: "#ff6bd6" },
-  lunar: { id: "lunar", name: "Lunar", multiplier: 3.6, color: "#aeb8ff" },
-  galactic: { id: "galactic", name: "Galactic", multiplier: 4.5, color: "#81d8e8" }
+  golden: { id: "golden", name: "Golden", multiplier: 1.7, color: "#ffd45c" },
+  giant: { id: "giant", name: "Giant", multiplier: 1.5, color: "#9dd05c" },
+  wet: { id: "wet", name: "Wet", multiplier: 1.25, color: "#6eb7d8" },
+  honeyed: { id: "honeyed", name: "Honeyed", multiplier: 1.85, color: "#f0bd45" },
+  frozen: { id: "frozen", name: "Frozen", multiplier: 1.8, color: "#b9e7ff" },
+  zen: { id: "zen", name: "Zen", multiplier: 2.1, color: "#e6a7ca" },
+  disco: { id: "disco", name: "Disco", multiplier: 2.4, color: "#ff6bd6" },
+  lunar: { id: "lunar", name: "Lunar", multiplier: 2.6, color: "#aeb8ff" },
+  galactic: { id: "galactic", name: "Galactic", multiplier: 3.2, color: "#81d8e8" }
 };
 
 const pets = {
   bee: {
     id: "bee",
     name: "Honey Bee",
-    cost: 80,
+    cost: 850,
     mark: "HB",
     color: "#f0bd45",
     description: "Adds 15% sell value."
@@ -296,7 +401,7 @@ const pets = {
   turtle: {
     id: "turtle",
     name: "Garden Turtle",
-    cost: 95,
+    cost: 1100,
     mark: "GT",
     color: "#5aa85c",
     description: "Offline plants grow 40% longer."
@@ -304,7 +409,7 @@ const pets = {
   owl: {
     id: "owl",
     name: "Moon Owl",
-    cost: 120,
+    cost: 1450,
     mark: "MO",
     color: "#8f9bd8",
     description: "Tasks reward 25% more petals."
@@ -312,7 +417,7 @@ const pets = {
   fox: {
     id: "fox",
     name: "Swift Fox",
-    cost: 145,
+    cost: 1750,
     mark: "SF",
     color: "#e98665",
     description: "All crops grow 20% faster."
@@ -320,7 +425,7 @@ const pets = {
   squirrel: {
     id: "squirrel",
     name: "Seed Squirrel",
-    cost: 170,
+    cost: 2100,
     mark: "SS",
     color: "#c99a5a",
     description: "Planting sometimes refunds a seed."
@@ -328,7 +433,7 @@ const pets = {
   frog: {
     id: "frog",
     name: "Rain Frog",
-    cost: 190,
+    cost: 2400,
     mark: "RF",
     color: "#6fd083",
     description: "Watering lasts twice as long."
@@ -336,7 +441,7 @@ const pets = {
   phoenix: {
     id: "phoenix",
     name: "Solar Phoenix",
-    cost: 320,
+    cost: 3800,
     mark: "SP",
     color: "#f08732",
     description: "Ready crops gain 20% extra sell value."
@@ -367,11 +472,21 @@ const pets = {
     mark: "LS",
     color: "#e6a7ca",
     description: "All task progress has a chance to count twice."
+  },
+  mutationMoth: {
+    id: "mutationMoth",
+    name: "Mutation Moth",
+    cost: 360,
+    eventOnly: "galaxy",
+    mark: "MM",
+    color: "#81d8e8",
+    description: "Mutates one planted crop every minute."
   }
 };
 
 const exclusiveItems = {
   honeySprout: { id: "honeySprout", type: "seed", itemId: "honeySprout", event: "honey", cost: 65 },
+  sugarCane: { id: "sugarCane", type: "seed", itemId: "sugarCane", event: "honey", cost: 135 },
   honeyGlazer: { id: "honeyGlazer", type: "gear", itemId: "honeyGlazer", event: "honey", cost: 90 },
   honeyEgg: {
     id: "honeyEgg",
@@ -383,7 +498,28 @@ const exclusiveItems = {
     description: "Hatches into a bee-themed garden pet.",
     hatchPets: ["bee", "queenBee", "squirrel"]
   },
+  queenBee: { id: "queenBee", type: "pet", petId: "queenBee", event: "honey", cost: 520 },
+  honeySeedPack: {
+    id: "honeySeedPack",
+    type: "pack",
+    name: "Honey Seed Pack",
+    event: "honey",
+    cost: 80,
+    color: "#f0bd45",
+    description: "Open for a random normal or honey event seed.",
+    seeds: ["carrot", "berry", "tomato", "melon", "honeySprout", "sugarCane", "nectarBloom"]
+  },
   discoSeed: { id: "discoSeed", type: "seed", itemId: "discoSeed", event: "disco", cost: 85 },
+  discoSeedPack: {
+    id: "discoSeedPack",
+    type: "pack",
+    name: "Disco Seed Pack",
+    event: "disco",
+    cost: 95,
+    color: "#ff6bd6",
+    description: "Open for a random seed with a chance at Disco Seed.",
+    seeds: ["berry", "tomato", "grape", "starfruit", "discoSeed", "mirrorMelon"]
+  },
   discoBall: {
     id: "discoBall",
     type: "cosmetic",
@@ -394,6 +530,16 @@ const exclusiveItems = {
     description: "Adds a spinning disco ball to your plot."
   },
   nightSeed: { id: "nightSeed", type: "seed", itemId: "nightSeed", event: "bloodMoon", cost: 95 },
+  nightSeedPack: {
+    id: "nightSeedPack",
+    type: "pack",
+    name: "Night Seed Pack",
+    event: "bloodMoon",
+    cost: 105,
+    color: "#7c6dff",
+    description: "Open for moonlit seeds and a chance at Night Seed.",
+    seeds: ["melon", "pumpkin", "grape", "starfruit", "nightSeed", "eclipsePepper"]
+  },
   moonLamp: {
     id: "moonLamp",
     type: "cosmetic",
@@ -404,6 +550,17 @@ const exclusiveItems = {
     description: "Places a glowing moon lamp by the plot."
   },
   cometSeed: { id: "cometSeed", type: "seed", itemId: "cometSeed", event: "galaxy", cost: 115 },
+  mutationMoth: { id: "mutationMoth", type: "pet", petId: "mutationMoth", event: "galaxy", cost: 360 },
+  galaxySeedPack: {
+    id: "galaxySeedPack",
+    type: "pack",
+    name: "Galaxy Seed Pack",
+    event: "galaxy",
+    cost: 125,
+    color: "#81d8e8",
+    description: "Open for high-tier seeds and a chance at Comet Seed.",
+    seeds: ["starfruit", "grape", "dragonfruit", "crystalBloom", "cometSeed", "stardustBean"]
+  },
   starCrate: {
     id: "starCrate",
     type: "egg",
@@ -412,7 +569,7 @@ const exclusiveItems = {
     cost: 180,
     color: "#81d8e8",
     description: "Hatches into a rare cosmic pet.",
-    hatchPets: ["owl", "phoenix", "lotusSpirit"]
+    hatchPets: ["owl", "phoenix", "lotusSpirit", "mutationMoth"]
   },
   snowLantern: { id: "snowLantern", type: "gear", itemId: "snowLantern", event: "christmas", cost: 110 },
   snowEgg: {
@@ -425,7 +582,20 @@ const exclusiveItems = {
     description: "Hatches into a winter pet.",
     hatchPets: ["snowSprite", "turtle", "frog"]
   },
+  snowSprite: { id: "snowSprite", type: "pet", petId: "snowSprite", event: "christmas", cost: 560 },
   zenRake: { id: "zenRake", type: "gear", itemId: "zenRake", event: "zen", cost: 130 },
+  everberry: { id: "everberry", type: "seed", itemId: "everberry", event: "zen", cost: 155 },
+  lotusSpirit: { id: "lotusSpirit", type: "pet", petId: "lotusSpirit", event: "zen", cost: 620 },
+  zenSeedPack: {
+    id: "zenSeedPack",
+    type: "pack",
+    name: "Zen Seed Pack",
+    event: "zen",
+    cost: 100,
+    color: "#e6a7ca",
+    description: "Open for calm seeds and a chance at Everberry.",
+    seeds: ["carrot", "berry", "melon", "starfruit", "everberry", "bambooHeart"]
+  },
   lotusBell: {
     id: "lotusBell",
     type: "cosmetic",
@@ -553,7 +723,7 @@ const events = [
     currencyLabel: "honey",
     turnInLabel: "Turn In Fruit for Honey",
     turnInRate: 16,
-    exclusiveShop: ["honeySprout", "honeyGlazer", "honeyEgg"],
+    exclusiveShop: ["honeySprout", "sugarCane", "honeySeedPack", "honeyGlazer", "honeyEgg", "queenBee"],
     tasks: [
       { id: "turnIn", label: "Turn in fruit twice", target: 2, reward: 32 },
       { id: "harvest", label: "Harvest 8 fruits", target: 8, reward: 24 }
@@ -571,7 +741,7 @@ const events = [
     currencyLabel: "snowflakes",
     turnInLabel: "Wrap Fruit Gifts",
     turnInRate: 18,
-    exclusiveShop: ["snowLantern", "snowEgg"],
+    exclusiveShop: ["snowLantern", "snowEgg", "snowSprite"],
     tasks: [
       { id: "turnIn", label: "Wrap 3 fruit gifts", target: 3, reward: 36 },
       { id: "buy", label: "Buy 3 shop items", target: 3, reward: 22 }
@@ -589,7 +759,7 @@ const events = [
     currencyLabel: "chi",
     turnInLabel: "Offer Fruit for Chi",
     turnInRate: 20,
-    exclusiveShop: ["zenRake", "lotusBell"],
+    exclusiveShop: ["everberry", "zenSeedPack", "zenRake", "lotusSpirit", "lotusBell"],
     tasks: [
       { id: "turnIn", label: "Make 2 fruit offerings", target: 2, reward: 34 },
       { id: "plant", label: "Plant 7 seeds", target: 7, reward: 21 }
@@ -604,7 +774,7 @@ const events = [
     saleMultiplier: 1,
     mutation: "disco",
     mutationChance: 0.2,
-    exclusiveShop: ["discoSeed", "discoBall"],
+    exclusiveShop: ["discoSeed", "discoSeedPack", "discoBall"],
     tasks: [
       { id: "mutatedHarvest", label: "Harvest 3 mutated fruits", target: 3, reward: 42 },
       { id: "plant", label: "Plant 9 seeds", target: 9, reward: 24 }
@@ -619,7 +789,7 @@ const events = [
     saleMultiplier: 1.35,
     mutation: "lunar",
     mutationChance: 0.18,
-    exclusiveShop: ["nightSeed", "moonLamp"],
+    exclusiveShop: ["nightSeed", "nightSeedPack", "moonLamp"],
     tasks: [
       { id: "mutatedHarvest", label: "Harvest 2 lunar or mutated fruits", target: 2, reward: 46 },
       { id: "sell", label: "Sell during Blood Moon", target: 1, reward: 30 }
@@ -634,11 +804,60 @@ const events = [
     saleMultiplier: 1.1,
     mutation: "galactic",
     mutationChance: 0.14,
-    exclusiveShop: ["cometSeed", "starCrate"],
+    exclusiveShop: ["cometSeed", "galaxySeedPack", "mutationMoth", "starCrate"],
     tasks: [
       { id: "mutatedHarvest", label: "Harvest 2 galactic fruits", target: 2, reward: 60 },
       { id: "water", label: "Water 8 crops", target: 8, reward: 26 }
     ]
+  }
+];
+
+const weatherTypes = [
+  {
+    id: "sunny",
+    name: "Sunny",
+    description: "Steady garden weather.",
+    skyTint: "rgba(255, 221, 119, 0.08)",
+    growthMultiplier: 1,
+    mutation: null,
+    mutationChance: 0
+  },
+  {
+    id: "rain",
+    name: "Rain",
+    description: "Rain can make crops Wet and grow faster.",
+    skyTint: "rgba(104, 165, 210, 0.2)",
+    growthMultiplier: 1.2,
+    mutation: "wet",
+    mutationChance: 0.28
+  },
+  {
+    id: "hail",
+    name: "Hail",
+    description: "Hail can freeze crops into valuable Frozen fruit.",
+    skyTint: "rgba(210, 235, 245, 0.24)",
+    growthMultiplier: 0.82,
+    mutation: "frozen",
+    mutationChance: 0.2
+  },
+  {
+    id: "fog",
+    name: "Fog",
+    description: "Fog slightly slows growth but improves rare mutation odds.",
+    skyTint: "rgba(190, 200, 188, 0.18)",
+    growthMultiplier: 0.92,
+    mutation: "golden",
+    mutationChance: 0.08
+  },
+  {
+    id: "heatwave",
+    name: "Heatwave",
+    description: "Heat speeds growth but crops stay smaller without sprinklers.",
+    skyTint: "rgba(240, 135, 50, 0.16)",
+    growthMultiplier: 1.35,
+    mutation: "giant",
+    mutationChance: 0.06,
+    sizePenalty: 0.9
   }
 ];
 
@@ -664,6 +883,13 @@ const defaultState = {
   eventIndex: Math.floor(Date.now() / (10 * 60 * 1000)) % events.length,
   eventSlot: Math.floor(Date.now() / (10 * 60 * 1000)),
   eventStartedAt: Date.now(),
+  weatherDuration: 3 * 60 * 1000,
+  weatherIndex: Math.floor(Date.now() / (3 * 60 * 1000)) % weatherTypes.length,
+  weatherSlot: Math.floor(Date.now() / (3 * 60 * 1000)),
+  plotCols: 5,
+  plotRows: 4,
+  shopOpen: true,
+  inventoryTab: "seeds",
   taskProgress: {},
   claimedTasks: {},
   inventory: {},
@@ -673,6 +899,10 @@ const defaultState = {
   equippedPet: null,
   ownedCosmetics: [],
   equippedCosmetic: null,
+  sprinklers: [],
+  lastPetMutationAt: Date.now(),
+  packOpening: false,
+  hoverCell: -1,
   hotbar: [
     { type: "seed", id: "carrot" },
     { type: "seed", id: "berry" },
@@ -701,6 +931,13 @@ function currentEvent() {
   return events[state.eventIndex];
 }
 
+function currentWeather() {
+  const slot = Math.floor(Date.now() / state.weatherDuration);
+  state.weatherIndex = slot % weatherTypes.length;
+  state.weatherSlot = slot;
+  return weatherTypes[state.weatherIndex];
+}
+
 function cloneDefaultState() {
   return JSON.parse(JSON.stringify(defaultState));
 }
@@ -723,7 +960,14 @@ function loadState() {
       cells: Array.isArray(saved.cells) ? saved.cells.slice(0, plot.cols * plot.rows) : base.cells,
       ownedPets: Array.isArray(saved.ownedPets) ? saved.ownedPets : [],
       ownedCosmetics: Array.isArray(saved.ownedCosmetics) ? saved.ownedCosmetics : [],
-      equippedCosmetic: saved.equippedCosmetic || null
+      equippedCosmetic: saved.equippedCosmetic || null,
+      sprinklers: Array.isArray(saved.sprinklers) ? saved.sprinklers : [],
+      lastPetMutationAt: saved.lastPetMutationAt || Date.now(),
+      packOpening: false,
+      plotCols: saved.plotCols || base.plotCols,
+      plotRows: saved.plotRows || base.plotRows,
+      shopOpen: saved.shopOpen !== false,
+      inventoryTab: saved.inventoryTab || "seeds"
     };
     while (merged.hotbar.length < 8) merged.hotbar.push(null);
     while (merged.cells.length < plot.cols * plot.rows) merged.cells.push(null);
@@ -754,6 +998,12 @@ function saveState() {
     equippedPet: state.equippedPet,
     ownedCosmetics: state.ownedCosmetics,
     equippedCosmetic: state.equippedCosmetic,
+    sprinklers: state.sprinklers,
+    lastPetMutationAt: state.lastPetMutationAt,
+    plotCols: state.plotCols,
+    plotRows: state.plotRows,
+    shopOpen: state.shopOpen,
+    inventoryTab: state.inventoryTab,
     hotbar: state.hotbar,
     cells: state.cells
   };
@@ -856,7 +1106,7 @@ function claimTask(eventId, task) {
 function cropValue() {
   return Object.entries(state.inventory).reduce((sum, [id, count]) => {
     const fruit = parseFruitKey(id);
-    return fruit.seed ? sum + fruit.seed.value * fruit.mutation.multiplier * count : sum;
+    return fruit.seed ? sum + baseFruitValue(fruit) * count : sum;
   }, 0);
 }
 
@@ -876,20 +1126,42 @@ function cropSellValue(id, count) {
   if (event.premiumSeeds && event.premiumSeeds.includes(fruit.seedId)) {
     multiplier *= event.premiumMultiplier || 1;
   }
-  return Math.round(fruit.seed.value * fruit.mutation.multiplier * count * multiplier);
+  return Math.round(baseFruitValue(fruit) * count * multiplier);
 }
 
-function fruitKey(seedId, mutationId = "normal") {
-  return mutationId && mutationId !== "normal" ? `${seedId}:${mutationId}` : seedId;
+function baseFruitValue(fruit) {
+  return fruit.seed.value * 0.22 * fruit.mutation.multiplier * fruit.size * fruit.sellRoll;
+}
+
+function plantSellEstimate(plant) {
+  const seed = seeds[plant.seedId];
+  if (!seed) return 0;
+  const fruit = {
+    seed,
+    seedId: plant.seedId,
+    mutationId: plant.mutation || "normal",
+    mutation: mutations[plant.mutation] || mutations.normal,
+    size: plant.size || 1,
+    sellRoll: plant.sellRoll || 1
+  };
+  return Math.round(baseFruitValue(fruit) * sellMultiplier());
+}
+
+function fruitKey(seedId, mutationId = "normal", size = 1, sellRoll = 1) {
+  const compactSize = Math.max(0.5, Math.min(3, size)).toFixed(2);
+  const compactRoll = Math.max(0.65, Math.min(1.35, sellRoll)).toFixed(2);
+  return `${seedId}:${mutationId || "normal"}:${compactSize}:${compactRoll}`;
 }
 
 function parseFruitKey(key) {
-  const [seedId, mutationId = "normal"] = key.split(":");
+  const [seedId, mutationId = "normal", size = "1", sellRoll = "1"] = key.split(":");
   return {
     seedId,
     mutationId,
     seed: seeds[seedId],
-    mutation: mutations[mutationId] || mutations.normal
+    mutation: mutations[mutationId] || mutations.normal,
+    size: Number(size) || 1,
+    sellRoll: Number(sellRoll) || 1
   };
 }
 
@@ -901,7 +1173,7 @@ function fruitName(seedId, mutationId = "normal") {
 
 function addFruitFromPlant(plant) {
   const mutationId = plant.mutation || "normal";
-  const key = fruitKey(plant.seedId, mutationId);
+  const key = fruitKey(plant.seedId, mutationId, plant.size || 1, plant.sellRoll || 1);
   state.inventory[key] = (state.inventory[key] || 0) + (plant.glazed ? 2 : 1);
   if (mutationId !== "normal") {
     addTaskProgress("mutatedHarvest");
@@ -910,6 +1182,10 @@ function addFruitFromPlant(plant) {
 
 function rollMutation() {
   const event = currentEvent();
+  const weather = currentWeather();
+  if (weather.mutation && Math.random() < weather.mutationChance) {
+    return weather.mutation;
+  }
   if (event.mutation && Math.random() < event.mutationChance) {
     return event.mutation;
   }
@@ -921,10 +1197,52 @@ function rollMutation() {
 
 function seedDefaultMutation(seedId) {
   if (seedId === "honeySprout") return "honeyed";
+  if (seedId === "sugarCane") return "honeyed";
+  if (seedId === "nectarBloom") return "honeyed";
   if (seedId === "discoSeed") return "disco";
+  if (seedId === "mirrorMelon") return "disco";
   if (seedId === "nightSeed") return "lunar";
+  if (seedId === "eclipsePepper") return "lunar";
   if (seedId === "cometSeed") return "galactic";
+  if (seedId === "stardustBean") return "galactic";
+  if (seedId === "everberry" || seedId === "bambooHeart") return "zen";
   return rollMutation();
+}
+
+function randomPlantSize(seedId) {
+  const weather = currentWeather();
+  const base = 0.78 + Math.random() * 0.58;
+  const premium = ["pumpkin", "melon", "dragonfruit", "crystalBloom"].includes(seedId) ? 0.18 : 0;
+  return Math.max(0.55, Math.min(2.6, (base + premium) * (weather.sizePenalty || 1)));
+}
+
+function randomSellRoll() {
+  return 0.72 + Math.random() * 0.58;
+}
+
+function sprinklerInfluence(index) {
+  if (!Array.isArray(state.sprinklers)) return 0;
+  const col = index % plot.cols;
+  const row = Math.floor(index / plot.cols);
+  return state.sprinklers.some((sprinkler) => {
+    const sx = sprinkler.index % plot.cols;
+    const sy = Math.floor(sprinkler.index / plot.cols);
+    return Math.abs(sx - col) <= 1 && Math.abs(sy - row) <= 1;
+  }) ? 1 : 0;
+}
+
+function activeCols() {
+  return Math.min(plot.cols, state.plotCols || 5);
+}
+
+function activeRows() {
+  return Math.min(plot.rows, state.plotRows || 4);
+}
+
+function isUnlockedCell(index) {
+  const col = index % plot.cols;
+  const row = Math.floor(index / plot.cols);
+  return col < activeCols() && row < activeRows();
 }
 
 function countBagItem(type, id) {
@@ -955,6 +1273,7 @@ function canShowEventItem(item) {
 function exclusiveData(exclusive) {
   if (exclusive.type === "seed") return seeds[exclusive.itemId];
   if (exclusive.type === "gear") return gear[exclusive.itemId];
+  if (exclusive.type === "pet") return pets[exclusive.petId];
   return exclusive;
 }
 
@@ -973,7 +1292,9 @@ function addToHotbar(type, id) {
   if (empty >= 0) {
     state.hotbar[empty] = { type, id };
     state.selectedSlot = empty;
+    return true;
   }
+  return false;
 }
 
 function buy(type, id) {
@@ -1015,14 +1336,17 @@ function buyPet(id) {
     renderUi();
     return;
   }
-  if (!state.devMode && state.eventCoins < pet.cost) {
-    setStatus(`Earn more ${eventCurrencyName()} from event tasks.`);
+  if (pet.eventOnly) {
+    setStatus("Exclusive pets are bought from their event shop.");
     return;
   }
   if (state.devMode) {
-    state.eventCoins = Math.max(state.eventCoins, 999999);
+    state.coins = Math.max(state.coins, 999999);
+  } else if (state.coins >= pet.cost) {
+    state.coins -= pet.cost;
   } else {
-    state.eventCoins -= pet.cost;
+    setStatus("Not enough coins for that pet.");
+    return;
   }
   state.ownedPets.push(id);
   state.equippedPet = id;
@@ -1042,8 +1366,39 @@ function hatchEgg(exclusive) {
   setStatus(`${exclusive.name} hatched into ${pet.name}.`);
 }
 
+function openSeedPack(exclusive) {
+  if (state.packOpening) return;
+  state.packOpening = true;
+  const pool = exclusive.seeds.filter((id) => seeds[id]);
+  const winner = pool[Math.floor(Math.random() * pool.length)];
+  const track = [];
+  for (let i = 0; i < 18; i += 1) {
+    track.push(pool[i % pool.length]);
+  }
+  track.push(winner);
+  ui.seedPackRoller.classList.add("active");
+  ui.seedPackRoller.innerHTML = `<div class="seed-pack-track">${track.map((id, index) => `<div class="seed-pack-tile${index === track.length - 1 ? " winner" : ""}">${seeds[id].name}</div>`).join("")}</div>`;
+  const trackEl = ui.seedPackRoller.querySelector(".seed-pack-track");
+  requestAnimationFrame(() => {
+    trackEl.style.transform = `translateX(-${Math.max(0, (track.length - 3) * 98)}px)`;
+  });
+  window.setTimeout(() => {
+    state.seedBag[winner] = (state.seedBag[winner] || 0) + 1;
+    const equipped = addToHotbar("seed", winner);
+    state.packOpening = false;
+    setStatus(`${exclusive.name} opened: ${seeds[winner].name}${equipped ? "." : " in inventory."}`);
+    saveState();
+    renderUi();
+    ui.seedPackRoller.classList.add("active");
+  }, 1250);
+}
+
 function buyExclusive(id) {
   const exclusive = exclusiveItems[id];
+  if (state.packOpening && exclusive && exclusive.type === "pack") {
+    setStatus("Wait for this seed pack to finish opening.");
+    return;
+  }
   if (!exclusive || exclusive.event !== currentEvent().id) {
     setStatus("That exclusive is not available right now.");
     return;
@@ -1069,16 +1424,26 @@ function buyExclusive(id) {
     setStatus(`${item.name} added to your hotbar.`);
   } else if (exclusive.type === "egg") {
     hatchEgg(exclusive);
+  } else if (exclusive.type === "pack") {
+    openSeedPack(exclusive);
   } else if (exclusive.type === "cosmetic") {
     if (!state.ownedCosmetics.includes(exclusive.id)) {
       state.ownedCosmetics.push(exclusive.id);
     }
     state.equippedCosmetic = state.equippedCosmetic === exclusive.id ? null : exclusive.id;
     setStatus(state.equippedCosmetic ? `${exclusive.name} equipped.` : `${exclusive.name} unequipped.`);
+  } else if (exclusive.type === "pet") {
+    if (!state.ownedPets.includes(exclusive.petId)) {
+      state.ownedPets.push(exclusive.petId);
+    }
+    state.equippedPet = exclusive.petId;
+    setStatus(`${pets[exclusive.petId].name} joined your garden.`);
   }
 
-  saveState();
-  renderUi();
+  if (exclusive.type !== "pack") {
+    saveState();
+    renderUi();
+  }
 }
 
 function turnInFruitForEventCurrency() {
@@ -1140,6 +1505,32 @@ function restock() {
   renderUi();
 }
 
+function expandPlot() {
+  const cols = activeCols();
+  const rows = activeRows();
+  if (cols >= plot.cols && rows >= plot.rows) {
+    setStatus("Your plot is fully expanded.");
+    return;
+  }
+  const nextCells = cols < plot.cols ? rows : cols;
+  const cost = 450 + nextCells * 180;
+  if (!state.devMode && state.coins < cost) {
+    setStatus(`Plot expansion costs ${cost} coins.`);
+    return;
+  }
+  if (!state.devMode) {
+    state.coins -= cost;
+  }
+  if (cols < plot.cols) {
+    state.plotCols = cols + 1;
+  } else {
+    state.plotRows = rows + 1;
+  }
+  setStatus(`Plot expanded to ${activeCols()} x ${activeRows()}.`);
+  saveState();
+  renderUi();
+}
+
 function useGear(id, index) {
   if ((state.gearBag[id] || 0) <= 0) {
     setStatus("Buy this gear before using it.");
@@ -1149,6 +1540,19 @@ function useGear(id, index) {
   if (id === "harvestGlove") {
     harvestArea(index);
     state.gearBag[id] -= 1;
+    saveState();
+    renderUi();
+    return;
+  }
+
+  if (id === "sprinkler") {
+    if (state.sprinklers.some((sprinkler) => sprinkler.index === index)) {
+      setStatus("There is already a sprinkler there.");
+      return;
+    }
+    state.sprinklers.push({ index, placedAt: Date.now() });
+    state.gearBag[id] -= 1;
+    setStatus("Sprinkler placed. Crops in its range grow bigger.");
     saveState();
     renderUi();
     return;
@@ -1173,11 +1577,6 @@ function useGear(id, index) {
     plant.fertilized = true;
     addTaskProgress("fertilize");
     setStatus("Fertilizer kicked the crop forward.");
-  }
-
-  if (id === "sprinkler") {
-    waterArea(index);
-    setStatus("Sprinkler watered the nearby patch.");
   }
 
   if (id === "growthTonic") {
@@ -1297,6 +1696,9 @@ function plantSeed(id, index) {
     growTime: seed.growTime,
     watered: 0,
     fertilized: false,
+    size: randomPlantSize(id),
+    sellRoll: randomSellRoll(),
+    regrow: Boolean(seed.regrow),
     sway: Math.random() * Math.PI * 2
   };
   addTaskProgress("plant");
@@ -1321,12 +1723,20 @@ function harvestCell(index) {
     return false;
   }
   addFruitFromPlant(plant);
-  state.cells[index] = null;
+  if (plant.regrow) {
+    plant.progress = 0;
+    plant.watered = 0;
+    plant.mutation = seedDefaultMutation(plant.seedId);
+    plant.size = Math.max(0.7, randomPlantSize(plant.seedId) * 0.92);
+    plant.sellRoll = randomSellRoll();
+  } else {
+    state.cells[index] = null;
+  }
   addTaskProgress("harvest");
   if (currentEvent().premiumSeeds && currentEvent().premiumSeeds.includes(plant.seedId)) {
     addTaskProgress("premiumHarvest");
   }
-  setStatus(`${fruitName(plant.seedId, plant.mutation)} harvested.`);
+  setStatus(plant.regrow ? `${seeds[plant.seedId].name} harvested and will regrow.` : `${fruitName(plant.seedId, plant.mutation)} harvested.`);
   saveState();
   renderUi();
   return true;
@@ -1343,7 +1753,15 @@ function harvestArea(index) {
       const plant = state.cells[i];
       if (plant && plant.progress >= plant.growTime) {
         addFruitFromPlant(plant);
-        state.cells[i] = null;
+        if (plant.regrow) {
+          plant.progress = 0;
+          plant.watered = 0;
+          plant.mutation = seedDefaultMutation(plant.seedId);
+          plant.size = Math.max(0.7, randomPlantSize(plant.seedId) * 0.92);
+          plant.sellRoll = randomSellRoll();
+        } else {
+          state.cells[i] = null;
+        }
         harvested += 1;
         if (currentEvent().premiumSeeds && currentEvent().premiumSeeds.includes(plant.seedId)) {
           addTaskProgress("premiumHarvest");
@@ -1358,6 +1776,10 @@ function harvestArea(index) {
 }
 
 function handlePlotClick(index) {
+  if (!isUnlockedCell(index)) {
+    setStatus("Expand your plot in the shop to use that soil.");
+    return;
+  }
   const plant = state.cells[index];
   if (plant && plant.progress >= plant.growTime) {
     harvestCell(index);
@@ -1397,8 +1819,22 @@ function cellAt(clientX, clientY) {
   const cellW = (canvas.width - plot.marginX * 2 - plot.gap * (plot.cols - 1)) / plot.cols;
   const cellH = (canvas.height - plot.marginY * 2 - plot.gap * (plot.rows - 1)) / plot.rows;
 
+  state.sprinklers.forEach((sprinkler) => {
+    if (!isUnlockedCell(sprinkler.index)) return;
+    const b = cellBounds(sprinkler.index);
+    const rangeX = b.x - cellW - plot.gap;
+    const rangeY = b.y - cellH - plot.gap;
+    ctx.fillStyle = "rgba(110, 183, 216, 0.12)";
+    drawRoundedRect(rangeX, rangeY, cellW * 3 + plot.gap * 2, cellH * 3 + plot.gap * 2, 14);
+    ctx.fill();
+    ctx.strokeStyle = "rgba(110, 183, 216, 0.42)";
+    ctx.lineWidth = 2;
+    ctx.stroke();
+  });
+
   for (let row = 0; row < plot.rows; row += 1) {
     for (let col = 0; col < plot.cols; col += 1) {
+      if (col >= activeCols() || row >= activeRows()) continue;
       const px = plot.marginX + col * (cellW + plot.gap);
       const py = plot.marginY + row * (cellH + plot.gap);
       if (x >= px && x <= px + cellW && y >= py && y <= py + cellH) {
@@ -1407,6 +1843,37 @@ function cellAt(clientX, clientY) {
     }
   }
   return -1;
+}
+
+function cellBounds(index) {
+  const cellW = (canvas.width - plot.marginX * 2 - plot.gap * (plot.cols - 1)) / plot.cols;
+  const cellH = (canvas.height - plot.marginY * 2 - plot.gap * (plot.rows - 1)) / plot.rows;
+  const col = index % plot.cols;
+  const row = Math.floor(index / plot.cols);
+  return {
+    x: plot.marginX + col * (cellW + plot.gap),
+    y: plot.marginY + row * (cellH + plot.gap),
+    w: cellW,
+    h: cellH,
+    col,
+    row
+  };
+}
+
+function updatePlantTooltip(event) {
+  const index = cellAt(event.clientX, event.clientY);
+  state.hoverCell = index;
+  const plant = index >= 0 ? state.cells[index] : null;
+  if (!plant || !seeds[plant.seedId]) {
+    ui.plantTooltip.style.display = "none";
+    return;
+  }
+  const progress = Math.floor((plant.progress / plant.growTime) * 100);
+  const mutation = mutations[plant.mutation] || mutations.normal;
+  ui.plantTooltip.innerHTML = `<strong>${fruitName(plant.seedId, plant.mutation)}</strong><span>Growth:</span> ${Math.min(100, progress)}%<br><span>Mutation:</span> ${mutation.name || "None"}<br><span>Size:</span> ${(plant.size || 1).toFixed(2)}x<br><span>Value:</span> ~${plantSellEstimate(plant)} coins${plant.regrow ? "<br><span>Regrows after harvest</span>" : ""}`;
+  ui.plantTooltip.style.left = `${event.clientX + 14}px`;
+  ui.plantTooltip.style.top = `${event.clientY + 14}px`;
+  ui.plantTooltip.style.display = "block";
 }
 
 function drawRoundedRect(x, y, w, h, r) {
@@ -1494,13 +1961,20 @@ function renderExclusiveShop() {
     icon.className = "shop-icon";
     if (exclusive.type === "seed" || exclusive.type === "gear") {
       drawIcon(icon, data, exclusive.type);
+    } else if (exclusive.type === "pet") {
+      icon.style.background = data.color;
+      icon.style.display = "grid";
+      icon.style.placeItems = "center";
+      icon.style.color = "#10150f";
+      icon.style.fontWeight = "900";
+      icon.textContent = data.mark;
     } else {
       icon.style.background = data.color;
       icon.style.display = "grid";
       icon.style.placeItems = "center";
       icon.style.color = "#10150f";
       icon.style.fontWeight = "900";
-      icon.textContent = exclusive.type === "egg" ? "EG" : "FX";
+      icon.textContent = exclusive.type === "egg" ? "EG" : exclusive.type === "pack" ? "PK" : "FX";
     }
 
     const meta = exclusive.type === "seed"
@@ -1552,7 +2026,7 @@ function renderShop() {
 
 function renderPets() {
   ui.petList.innerHTML = "";
-  Object.values(pets).filter((pet) => !pet.eventOnly || pet.eventOnly === currentEvent().id || state.ownedPets.includes(pet.id)).forEach((pet) => {
+  Object.values(pets).filter((pet) => !pet.eventOnly || state.ownedPets.includes(pet.id)).forEach((pet) => {
     const owned = state.ownedPets.includes(pet.id);
     const equipped = state.equippedPet === pet.id;
     const row = document.createElement("div");
@@ -1570,8 +2044,8 @@ function renderPets() {
     const button = document.createElement("button");
     button.className = "buy-button";
     button.type = "button";
-    button.textContent = owned ? (equipped ? "Rest" : "Equip") : `${pet.cost}${eventCurrencyName()[0]}`;
-    button.disabled = !state.devMode && !owned && state.eventCoins < pet.cost;
+    button.textContent = owned ? (equipped ? "Rest" : "Equip") : `${pet.cost}c`;
+    button.disabled = !state.devMode && !owned && state.coins < pet.cost;
     button.addEventListener("click", () => buyPet(pet.id));
 
     row.append(icon, text, button);
@@ -1600,7 +2074,7 @@ function renderInventory() {
     drawIcon(icon, data, "seed");
     const value = cropSellValue(id, count);
     row.append(icon);
-    row.insertAdjacentHTML("beforeend", `<div><div class="item-name">${fruitName(fruit.seedId, fruit.mutationId)} x${count}</div><div class="item-meta">Worth ${value} coins now</div></div>`);
+    row.insertAdjacentHTML("beforeend", `<div><div class="item-name">${fruitName(fruit.seedId, fruit.mutationId)} x${count}</div><div class="item-meta">${fruit.size.toFixed(2)}x size, worth ${value} coins now</div></div>`);
     ui.inventoryList.appendChild(row);
   });
 }
@@ -1632,14 +2106,63 @@ function renderHotbar() {
   });
 }
 
+function openInventory() {
+  ui.inventoryOverlay.classList.add("open");
+  ui.inventoryOverlay.setAttribute("aria-hidden", "false");
+  renderItemInventory();
+}
+
+function closeInventory() {
+  ui.inventoryOverlay.classList.remove("open");
+  ui.inventoryOverlay.setAttribute("aria-hidden", "true");
+}
+
+function equipFromInventory(type, id) {
+  if (countBagItem(type, id) <= 0) return;
+  state.hotbar[state.selectedSlot] = { type, id };
+  setStatus(`${type === "seed" ? seeds[id].name : gear[id].name} equipped in slot ${state.selectedSlot + 1}.`);
+  saveState();
+  renderHotbar();
+}
+
+function renderItemInventory() {
+  const type = state.inventoryTab || "seeds";
+  const bag = type === "seeds" ? state.seedBag : state.gearBag;
+  const source = type === "seeds" ? seeds : gear;
+  ui.itemInventoryList.innerHTML = "";
+  Object.entries(bag)
+    .filter(([id, count]) => count > 0 && source[id])
+    .sort(([a], [b]) => source[a].name.localeCompare(source[b].name))
+    .forEach(([id, count]) => {
+      const data = source[id];
+      const button = document.createElement("button");
+      button.className = "inventory-pick";
+      button.type = "button";
+      const icon = document.createElement("div");
+      icon.className = "slot-icon";
+      drawIcon(icon, data, type === "seeds" ? "seed" : "gear");
+      const text = document.createElement("div");
+      text.innerHTML = `<div class="item-name">${data.name} x${count}</div><div class="item-meta">Equip to hotbar slot ${state.selectedSlot + 1}</div>`;
+      button.append(icon, text);
+      button.addEventListener("click", () => equipFromInventory(type === "seeds" ? "seed" : "gear", id));
+      ui.itemInventoryList.appendChild(button);
+    });
+  if (!ui.itemInventoryList.children.length) {
+    ui.itemInventoryList.innerHTML = `<div class="inventory-item"><div></div><div><div class="item-name">No ${type}</div><div class="item-meta">Buy items or open seed packs to fill this.</div></div></div>`;
+  }
+}
+
 function renderUi() {
   const event = currentEvent();
+  const weather = currentWeather();
   renderedEventSlot = state.eventSlot;
+  renderedWeatherSlot = state.weatherSlot;
   ui.coins.textContent = state.devMode ? "∞" : state.coins;
   ui.eventCoins.textContent = state.devMode ? "∞" : state.eventCoins;
   ui.eventCoinLabel.textContent = eventCurrencyName();
   ui.cropValue.textContent = Math.round(cropValue() * sellMultiplier());
   ui.day.textContent = `Day ${1 + Math.floor((Date.now() - state.startedAt) / 90000)}`;
+  ui.weather.textContent = weather.name;
   ui.eventName.textContent = event.name;
   ui.eventDescription.textContent = event.description;
   ui.eventTradeButton.textContent = event.turnInLabel || "No Fruit Trade";
@@ -1647,19 +2170,38 @@ function renderUi() {
   ui.eventTimer.textContent = formatTime(state.eventDuration - (Date.now() - state.eventStartedAt));
   ui.sellButton.disabled = cropValue() <= 0;
   ui.quickSellButton.disabled = cropValue() <= 0;
+  ui.shopDrawer.classList.toggle("open", state.shopOpen);
+  ui.shopToggleButton.textContent = state.shopOpen ? "Close Shop" : "Shop";
+  ui.plotSize.textContent = `Current plot: ${activeCols()} x ${activeRows()}`;
+  const cols = activeCols();
+  const rows = activeRows();
+  const nextCells = cols < plot.cols ? rows : cols;
+  const expandCost = 450 + nextCells * 180;
+  ui.expandPlotButton.textContent = cols >= plot.cols && rows >= plot.rows ? "Maxed" : `${expandCost}c`;
+  ui.expandPlotButton.disabled = !state.devMode && (cols >= plot.cols && rows >= plot.rows || state.coins < expandCost);
   renderTasks();
   renderExclusiveShop();
   renderShop();
   renderPets();
   renderInventory();
   renderHotbar();
+  if (ui.inventoryOverlay.classList.contains("open")) {
+    renderItemInventory();
+  }
 }
 
 function updatePlants(dt) {
   const event = currentEvent();
-  state.cells.forEach((plant) => {
+  const weather = currentWeather();
+  state.cells.forEach((plant, index) => {
     if (!plant) return;
-    let multiplier = (event.growthMultiplier || 1) * growthBonus();
+    const sprinkler = sprinklerInfluence(index);
+    let multiplier = (event.growthMultiplier || 1) * (weather.growthMultiplier || 1) * growthBonus();
+    if (sprinkler) {
+      multiplier *= 1.28;
+      plant.watered = Math.max(plant.watered || 0, 4);
+      plant.size = Math.min(3, (plant.size || 1) + dt * 0.012);
+    }
     if (plant.watered > 0) {
       multiplier *= event.wateredMultiplier || 1.25;
       plant.watered = Math.max(0, plant.watered - dt);
@@ -1670,14 +2212,68 @@ function updatePlants(dt) {
   });
 }
 
+function runPetMutation() {
+  if (state.equippedPet !== "mutationMoth") return;
+  if (Date.now() - (state.lastPetMutationAt || 0) < 60000) return;
+  const candidates = state.cells
+    .map((plant, index) => ({ plant, index }))
+    .filter((entry) => entry.plant && (!entry.plant.mutation || entry.plant.mutation === "normal" || entry.plant.mutation === "wet"));
+  if (!candidates.length) {
+    state.lastPetMutationAt = Date.now();
+    return;
+  }
+  const picked = candidates[Math.floor(Math.random() * candidates.length)];
+  const options = ["golden", "giant", currentEvent().mutation, currentWeather().mutation, "galactic"].filter(Boolean);
+  picked.plant.mutation = options[Math.floor(Math.random() * options.length)];
+  state.lastPetMutationAt = Date.now();
+  setStatus(`Mutation Moth changed a crop into ${mutations[picked.plant.mutation].name}.`);
+  saveState();
+}
+
 function drawGarden(time) {
   const event = currentEvent();
+  const weather = currentWeather();
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.fillStyle = event.sky;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = weather.skyTint;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  ctx.fillStyle = "#304428";
+  ctx.fillStyle = "#2f4a30";
   ctx.fillRect(0, canvas.height * 0.08, canvas.width, canvas.height * 0.92);
+
+  const grassGradient = ctx.createLinearGradient(0, canvas.height * 0.08, 0, canvas.height);
+  grassGradient.addColorStop(0, "rgba(121, 212, 109, 0.16)");
+  grassGradient.addColorStop(1, "rgba(12, 26, 17, 0.34)");
+  ctx.fillStyle = grassGradient;
+  ctx.fillRect(0, canvas.height * 0.08, canvas.width, canvas.height * 0.92);
+
+  if (weather.id === "rain") {
+    ctx.strokeStyle = "rgba(160, 210, 240, 0.45)";
+    ctx.lineWidth = 2;
+    for (let x = -30; x < canvas.width; x += 32) {
+      ctx.beginPath();
+      ctx.moveTo(x + (time / 20) % 32, 0);
+      ctx.lineTo(x + 35 + (time / 20) % 32, canvas.height);
+      ctx.stroke();
+    }
+  }
+
+  if (weather.id === "hail") {
+    ctx.fillStyle = "rgba(235, 250, 255, 0.8)";
+    for (let i = 0; i < 36; i += 1) {
+      ctx.beginPath();
+      ctx.arc((i * 83 + time / 14) % canvas.width, (i * 47 + time / 8) % canvas.height, 3, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+
+  if (weather.id === "fog") {
+    ctx.fillStyle = "rgba(210, 218, 206, 0.16)";
+    for (let y = 90; y < canvas.height; y += 70) {
+      ctx.fillRect(Math.sin(time / 900 + y) * 60, y, canvas.width, 24);
+    }
+  }
 
   if (event.id === "drizzle") {
     ctx.strokeStyle = "rgba(180, 220, 235, 0.34)";
@@ -1773,13 +2369,29 @@ function drawGarden(time) {
       const x = plot.marginX + col * (cellW + plot.gap);
       const y = plot.marginY + row * (cellH + plot.gap);
       const plant = state.cells[index];
+      const unlocked = col < activeCols() && row < activeRows();
 
-      ctx.fillStyle = "#6a4429";
+      const soil = ctx.createLinearGradient(x, y, x, y + cellH);
+      soil.addColorStop(0, "#855a36");
+      soil.addColorStop(1, "#51331f");
+      ctx.fillStyle = unlocked ? soil : "#1f2a22";
       drawRoundedRect(x, y, cellW, cellH, 8);
       ctx.fill();
-      ctx.fillStyle = "rgba(255,255,255,0.08)";
-      ctx.fillRect(x + 8, y + 12, cellW - 16, 5);
-      ctx.fillRect(x + 8, y + cellH - 18, cellW - 16, 5);
+      ctx.strokeStyle = index === state.hoverCell ? "rgba(200, 234, 116, 0.9)" : unlocked ? "rgba(255,255,255,0.11)" : "rgba(255,255,255,0.04)";
+      ctx.lineWidth = index === state.hoverCell ? 3 : 1;
+      ctx.stroke();
+      if (!unlocked) {
+        ctx.fillStyle = "rgba(0,0,0,0.28)";
+        ctx.fillRect(x + 7, y + 7, cellW - 14, cellH - 14);
+        ctx.fillStyle = "#b9c1ae";
+        ctx.font = "800 10px Inter, sans-serif";
+        ctx.fillText("LOCKED", x + 12, y + cellH / 2);
+        continue;
+      }
+      ctx.fillStyle = "rgba(255,255,255,0.1)";
+      for (let ridge = 0; ridge < 3; ridge += 1) {
+        ctx.fillRect(x + 8, y + 13 + ridge * 18, cellW - 16, 4);
+      }
 
       if (plant && seeds[plant.seedId]) {
         const data = seeds[plant.seedId];
@@ -1788,7 +2400,8 @@ function drawGarden(time) {
         const cx = x + cellW / 2;
         const cy = y + cellH / 2;
         const sway = Math.sin(time / 450 + plant.sway) * 2;
-        const radius = 6 + progress * 19;
+        const sizeFactor = Math.sqrt(plant.size || 1);
+        const radius = (6 + progress * 17) * sizeFactor;
 
         ctx.fillStyle = plant.watered > 0 ? "rgba(112, 183, 216, 0.28)" : "rgba(0,0,0,0.12)";
         ctx.beginPath();
@@ -1796,12 +2409,14 @@ function drawGarden(time) {
         ctx.fill();
 
         ctx.strokeStyle = data.leaf;
-        ctx.lineWidth = 5;
+        ctx.lineWidth = 4 + progress * 2;
         ctx.beginPath();
         ctx.moveTo(cx, cy + 20);
-        ctx.quadraticCurveTo(cx + sway, cy, cx - 11, cy - 13);
+        ctx.quadraticCurveTo(cx + sway, cy, cx - 13 * sizeFactor, cy - 14 * sizeFactor);
         ctx.moveTo(cx, cy + 20);
-        ctx.quadraticCurveTo(cx - sway, cy - 3, cx + 12, cy - 12);
+        ctx.quadraticCurveTo(cx - sway, cy - 3, cx + 13 * sizeFactor, cy - 13 * sizeFactor);
+        ctx.moveTo(cx, cy + 18);
+        ctx.quadraticCurveTo(cx + sway * 0.5, cy + 2, cx, cy - 18 * sizeFactor);
         ctx.stroke();
 
         ctx.fillStyle = mutation.color || data.color;
@@ -1816,6 +2431,22 @@ function drawGarden(time) {
         if (plant.mutation === "galactic") {
           ctx.fillStyle = "rgba(255,255,255,0.75)";
           drawStar(cx + radius * 0.6, cy - radius * 0.3, 5, 2);
+        }
+        if (plant.mutation === "wet") {
+          ctx.fillStyle = "rgba(180, 225, 245, 0.7)";
+          ctx.beginPath();
+          ctx.arc(cx + radius * 0.45, cy + radius * 0.1, 4, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        if (plant.mutation === "frozen") {
+          ctx.strokeStyle = "rgba(235, 250, 255, 0.8)";
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(cx - radius, cy + 10);
+          ctx.lineTo(cx + radius, cy - 8);
+          ctx.moveTo(cx - radius * 0.6, cy - 9);
+          ctx.lineTo(cx + radius * 0.7, cy + 15);
+          ctx.stroke();
         }
         ctx.fillStyle = "rgba(255,255,255,0.22)";
         ctx.beginPath();
@@ -1832,9 +2463,35 @@ function drawGarden(time) {
           ctx.lineWidth = 2;
           ctx.stroke();
         }
+        if (plant.regrow) {
+          ctx.fillStyle = "#c8ea74";
+          ctx.font = "800 11px Inter, sans-serif";
+          ctx.fillText("REGROW", x + 8, y + cellH - 8);
+        }
       }
     }
   }
+
+  state.sprinklers.forEach((sprinkler) => {
+    const b = cellBounds(sprinkler.index);
+    const cx = b.x + b.w / 2;
+    const cy = b.y + b.h / 2;
+    ctx.fillStyle = "#6eb7d8";
+    ctx.beginPath();
+    ctx.arc(cx, cy, 12, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = "#f4f1e8";
+    ctx.fillRect(cx - 3, cy - 20, 6, 20);
+    ctx.strokeStyle = "rgba(180, 225, 245, 0.75)";
+    ctx.lineWidth = 2;
+    for (let i = 0; i < 6; i += 1) {
+      const angle = time / 500 + i * Math.PI / 3;
+      ctx.beginPath();
+      ctx.moveTo(cx, cy - 18);
+      ctx.lineTo(cx + Math.cos(angle) * 26, cy - 18 + Math.sin(angle) * 26);
+      ctx.stroke();
+    }
+  });
 
   const pet = petBonus();
   if (pet) {
@@ -1901,20 +2558,24 @@ function drawGarden(time) {
     drawStar(canvas.width - 78, canvas.height - 62, 13, 6);
   }
 
-  ctx.fillStyle = "rgba(0,0,0,0.36)";
-  drawRoundedRect(20, 20, 282, 38, 8);
+  ctx.fillStyle = "rgba(0,0,0,0.42)";
+  drawRoundedRect(20, 20, 360, 48, 8);
   ctx.fill();
   ctx.fillStyle = "#f4f1e8";
   ctx.font = "700 16px Inter, sans-serif";
-  ctx.fillText("Click soil to plant, boost, or harvest", 36, 44);
+  ctx.fillText(`Weather: ${weather.name}`, 36, 42);
+  ctx.fillStyle = "#b9c1ae";
+  ctx.font = "600 12px Inter, sans-serif";
+  ctx.fillText(weather.description, 36, 58);
 }
 
 function tick(now) {
   const dt = Math.min(0.08, (now - state.lastTime) / 1000);
   state.lastTime = now;
   updatePlants(dt);
+  runPetMutation();
   drawGarden(now);
-  if (state.eventSlot !== renderedEventSlot) {
+  if (state.eventSlot !== renderedEventSlot || state.weatherSlot !== renderedWeatherSlot) {
     renderUi();
   }
 
@@ -1926,6 +2587,7 @@ function tick(now) {
   }
   ui.eventTimer.textContent = formatTime(state.eventDuration - (Date.now() - state.eventStartedAt));
   ui.day.textContent = `Day ${1 + Math.floor((Date.now() - state.startedAt) / 90000)}`;
+  ui.weather.textContent = currentWeather().name;
   requestAnimationFrame(tick);
 }
 
@@ -1936,7 +2598,28 @@ canvas.addEventListener("click", (event) => {
   }
 });
 
+canvas.addEventListener("mousemove", updatePlantTooltip);
+canvas.addEventListener("mouseleave", () => {
+  state.hoverCell = -1;
+  ui.plantTooltip.style.display = "none";
+});
+
 window.addEventListener("keydown", (event) => {
+  if (event.key.toLowerCase() === "e" && !event.ctrlKey && !event.metaKey && !event.altKey) {
+    event.preventDefault();
+    if (ui.inventoryOverlay.classList.contains("open")) {
+      closeInventory();
+    } else {
+      openInventory();
+    }
+    return;
+  }
+
+  if (event.key === "Escape" && ui.inventoryOverlay.classList.contains("open")) {
+    closeInventory();
+    return;
+  }
+
   const number = Number(event.key);
   if (number >= 1 && number <= 8) {
     state.selectedSlot = number - 1;
@@ -1980,9 +2663,33 @@ ui.quickSellButton.addEventListener("click", sellAll);
 ui.restockButton.addEventListener("click", restock);
 ui.resetButton.addEventListener("click", resetProgress);
 ui.eventTradeButton.addEventListener("click", turnInFruitForEventCurrency);
+ui.shopToggleButton.addEventListener("click", () => {
+  state.shopOpen = !state.shopOpen;
+  saveState();
+  renderUi();
+});
+ui.expandPlotButton.addEventListener("click", expandPlot);
+ui.closeInventoryButton.addEventListener("click", closeInventory);
+ui.inventoryOverlay.addEventListener("click", (event) => {
+  if (event.target === ui.inventoryOverlay) {
+    closeInventory();
+  }
+});
+document.querySelectorAll("[data-inventory-tab]").forEach((button) => {
+  button.addEventListener("click", () => {
+    state.inventoryTab = button.dataset.inventoryTab;
+    document.querySelectorAll("[data-inventory-tab]").forEach((tab) => {
+      tab.classList.toggle("active", tab === button);
+    });
+    saveState();
+    renderItemInventory();
+  });
+});
 
 currentEvent();
+currentWeather();
 let renderedEventSlot = state.eventSlot;
+let renderedWeatherSlot = state.weatherSlot;
 let cheatBuffer = "";
 if (offlineReport && offlineReport.minutes > 0) {
   setStatus(`Welcome back. ${offlineReport.minutes} offline minutes grew ${offlineReport.matured} crops.`);

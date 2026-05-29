@@ -57,10 +57,11 @@ button:disabled {
 }
 
 .game-shell {
-  min-height: calc(100vh - 40px);
+  height: calc(100vh - 40px);
   display: grid;
   grid-template-rows: auto minmax(0, 1fr) auto;
   gap: 14px;
+  position: relative;
 }
 
 .topbar,
@@ -146,21 +147,118 @@ h3 {
 
 .play-area {
   min-height: 0;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 340px;
-  gap: 14px;
+  position: relative;
+  overflow: hidden;
 }
 
 #garden {
   width: 100%;
   height: 100%;
-  min-height: 500px;
+  min-height: 0;
   display: block;
   border: 1px solid var(--line);
   border-radius: 8px;
   background: #405232;
   box-shadow: inset 0 0 0 1px rgba(255,255,255,0.05), 0 18px 48px rgba(0,0,0,0.32);
   touch-action: manipulation;
+}
+
+.shop-toggle {
+  position: absolute;
+  top: 104px;
+  right: 12px;
+  z-index: 12;
+  min-height: 42px;
+  min-width: 86px;
+  border-radius: 8px;
+  background: var(--gold);
+  border-color: #ffe08b;
+  color: #10150f;
+  font-weight: 900;
+}
+
+.plant-tooltip {
+  position: fixed;
+  z-index: 20;
+  max-width: 240px;
+  pointer-events: none;
+  display: none;
+  padding: 10px 12px;
+  border: 1px solid rgba(200, 234, 116, 0.5);
+  border-radius: 8px;
+  background: rgba(13, 19, 15, 0.94);
+  color: var(--text);
+  box-shadow: 0 16px 34px rgba(0, 0, 0, 0.35);
+  font-size: 0.86rem;
+  line-height: 1.35;
+}
+
+.plant-tooltip strong {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--focus);
+}
+
+.plant-tooltip span {
+  color: var(--muted);
+}
+
+.inventory-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+  background: rgba(0, 0, 0, 0.55);
+}
+
+.inventory-overlay.open {
+  display: flex;
+}
+
+.inventory-modal {
+  width: min(720px, 100%);
+  max-height: min(720px, 88vh);
+  overflow: auto;
+  padding: 16px;
+  border: 1px solid rgba(200, 234, 116, 0.45);
+  border-radius: 8px;
+  background: rgba(21, 35, 27, 0.98);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.5);
+}
+
+#inventoryHint {
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 0.86rem;
+}
+
+.inventory-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.item-inventory-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 8px;
+}
+
+.inventory-pick {
+  min-width: 0;
+  min-height: 64px;
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  padding: 8px;
+  border-radius: 8px;
+  text-align: left;
+  background: #20291f;
 }
 
 .panel {
@@ -171,6 +269,21 @@ h3 {
   overflow: auto;
   padding: 14px;
   border-radius: 8px;
+}
+
+.shop-drawer {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 10;
+  width: min(360px, calc(100vw - 28px));
+  height: 100%;
+  transform: translateX(calc(100% + 16px));
+  transition: transform 180ms ease;
+}
+
+.shop-drawer.open {
+  transform: translateX(0);
 }
 
 .panel section {
@@ -339,6 +452,44 @@ h3 {
   font-size: 0.86rem;
 }
 
+.seed-pack-roller {
+  display: none;
+  margin-top: 10px;
+  overflow: hidden;
+  border: 1px solid rgba(200, 234, 116, 0.42);
+  border-radius: 8px;
+  background: #10150f;
+}
+
+.seed-pack-roller.active {
+  display: block;
+}
+
+.seed-pack-track {
+  display: flex;
+  gap: 6px;
+  padding: 8px;
+  transform: translateX(0);
+  transition: transform 1200ms cubic-bezier(.18,.8,.2,1);
+}
+
+.seed-pack-tile {
+  min-width: 92px;
+  padding: 8px;
+  border-radius: 7px;
+  background: #263121;
+  border: 1px solid var(--line);
+  text-align: center;
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.seed-pack-tile.winner {
+  background: var(--gold);
+  color: #10150f;
+  border-color: #ffe08b;
+}
+
 .task-list {
   margin-top: 10px;
 }
@@ -410,6 +561,9 @@ h3 {
 .hotbar-wrap {
   padding: 10px;
   border-radius: 8px;
+  position: sticky;
+  bottom: 0;
+  z-index: 15;
 }
 
 .hotbar {
@@ -482,11 +636,11 @@ h3 {
   }
 
   .play-area {
-    grid-template-columns: 1fr;
+    min-height: 0;
   }
 
   #garden {
-    min-height: 56vh;
+    min-height: 0;
   }
 
   .panel {
