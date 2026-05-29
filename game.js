@@ -26,6 +26,7 @@ const ui = {
   inventoryOverlay: document.getElementById("inventoryOverlay"),
   closeInventoryButton: document.getElementById("closeInventoryButton"),
   petList: document.getElementById("petList"),
+  petHint: document.getElementById("petHint"),
   hotbar: document.getElementById("hotbar"),
   plantTooltip: document.getElementById("plantTooltip"),
   quickSellButton: document.getElementById("quickSellButton"),
@@ -897,6 +898,10 @@ const defaultState = {
   gearBag: {},
   ownedPets: [],
   equippedPet: null,
+  placedPets: [],
+  petEggs: [],
+  petCapacity: 3,
+  petTab: "pets",
   ownedCosmetics: [],
   equippedCosmetic: null,
   sprinklers: [],
@@ -959,6 +964,10 @@ function loadState() {
       hotbar: Array.isArray(saved.hotbar) ? saved.hotbar.slice(0, 8) : base.hotbar,
       cells: Array.isArray(saved.cells) ? saved.cells.slice(0, plot.cols * plot.rows) : base.cells,
       ownedPets: Array.isArray(saved.ownedPets) ? saved.ownedPets : [],
+      placedPets: Array.isArray(saved.placedPets) ? saved.placedPets : [],
+      petEggs: Array.isArray(saved.petEggs) ? saved.petEggs : [],
+      petCapacity: saved.petCapacity || base.petCapacity,
+      petTab: saved.petTab || "pets",
       ownedCosmetics: Array.isArray(saved.ownedCosmetics) ? saved.ownedCosmetics : [],
       equippedCosmetic: saved.equippedCosmetic || null,
       sprinklers: Array.isArray(saved.sprinklers) ? saved.sprinklers : [],
@@ -996,6 +1005,10 @@ function saveState() {
     gearBag: state.gearBag,
     ownedPets: state.ownedPets,
     equippedPet: state.equippedPet,
+    placedPets: state.placedPets,
+    petEggs: state.petEggs,
+    petCapacity: state.petCapacity,
+    petTab: state.petTab,
     ownedCosmetics: state.ownedCosmetics,
     equippedCosmetic: state.equippedCosmetic,
     sprinklers: state.sprinklers,
@@ -1011,27 +1024,27 @@ function saveState() {
 }
 
 function petBonus() {
-  return pets[state.equippedPet] || null;
+  return state.placedPets[0] ? pets[state.placedPets[0].petId] : null;
 }
 
 function growthBonus() {
-  return state.equippedPet === "fox" ? 1.2 : 1;
+  return hasActivePet("fox") ? 1.2 : 1;
 }
 
 function saleBonus() {
-  let bonus = state.equippedPet === "bee" ? 1.15 : 1;
-  if (state.equippedPet === "phoenix") {
+  let bonus = hasActivePet("bee") ? 1.15 : 1;
+  if (hasActivePet("phoenix")) {
     bonus *= 1.2;
   }
   return bonus;
 }
 
 function taskRewardBonus() {
-  return state.equippedPet === "owl" ? 1.25 : 1;
+  return hasActivePet("owl") ? 1.25 : 1;
 }
 
 function offlineLimitSeconds() {
-  return state.equippedPet === "turtle" ? 8 * 60 * 60 : 5 * 60 * 60;
+  return hasActivePet("turtle") ? 8 * 60 * 60 : 5 * 60 * 60;
 }
 
 function applyOfflineGrowth() {
@@ -1079,7 +1092,7 @@ function taskProgress(key) {
 function addTaskProgress(action, amount = 1) {
   const event = currentEvent();
   let changed = false;
-  const gained = state.equippedPet === "lotusSpirit" && Math.random() < 0.2 ? amount + 1 : amount;
+  const gained = hasActivePet("lotusSpirit") && Math.random() < 0.2 ? amount + 1 : amount;
   event.tasks.forEach((task) => {
     if (task.id !== action) return;
     const key = taskKey(event.id, task.id);
@@ -1245,6 +1258,39 @@ function isUnlockedCell(index) {
   return col < activeCols() && row < activeRows();
 }
 
+function hasActivePet(id) {
+  return state.placedPets.some((pet) => pet.petId === id);
+}
+
+function activePetCount() {
+  return state.placedPets.length;
+}
+
+function petIsPlaced(id) {
+  return state.placedPets.some((pet) => pet.petId === id);
+}
+
+function petPosition(pet, time) {
+  const phase = pet.phase || 0;
+  const t = time / 1000 + phase;
+  const col = Math.max(0, Math.min(activeCols() - 1, (pet.homeIndex ?? 0) % plot.cols));
+  const row = Math.max(0, Math.min(activeRows() - 1, Math.floor((pet.homeIndex ?? 0) / plot.cols)));
+  const b = cellBounds(row * plot.cols + col);
+  return {
+    x: b.x + b.w / 2 + Math.sin(t * 0.8) * b.w * 0.45,
+    y: b.y + b.h / 2 + Math.cos(t * 0.65) * b.h * 0.35
+  };
+}
+
+function petAgeText(pet) {
+  const elapsed = Math.max(0, Date.now() - (pet.placedAt || Date.now()));
+  const minutes = Math.floor(elapsed / 60000);
+  if (minutes < 1) return "Baby";
+  if (minutes < 10) return `${minutes}m`;
+  const hours = Math.floor(minutes / 60);
+  return hours ? `${hours}h ${minutes % 60}m` : `${minutes}m`;
+}
+
 function countBagItem(type, id) {
   return type === "seed" ? state.seedBag[id] || 0 : state.gearBag[id] || 0;
 }
@@ -1330,8 +1376,7 @@ function buy(type, id) {
 function buyPet(id) {
   const pet = pets[id];
   if (state.ownedPets.includes(id)) {
-    state.equippedPet = state.equippedPet === id ? null : id;
-    setStatus(state.equippedPet ? `${pet.name} equipped.` : `${pet.name} is resting.`);
+    togglePlacedPet(id);
     saveState();
     renderUi();
     return;
@@ -1349,8 +1394,91 @@ function buyPet(id) {
     return;
   }
   state.ownedPets.push(id);
-  state.equippedPet = id;
+  placePet(id);
   setStatus(`${pet.name} joined your garden.`);
+  saveState();
+  renderUi();
+}
+
+function placePet(id) {
+  if (petIsPlaced(id)) return true;
+  if (activePetCount() >= state.petCapacity) {
+    setStatus(`Pet limit reached (${activePetCount()}/${state.petCapacity}). Pick up a pet first.`);
+    return false;
+  }
+  state.placedPets.push({
+    petId: id,
+    placedAt: Date.now(),
+    homeIndex: Math.floor(Math.random() * Math.max(1, activeCols() * activeRows())),
+    phase: Math.random() * 10
+  });
+  state.equippedPet = state.placedPets[0]?.petId || null;
+  return true;
+}
+
+function pickupPet(id) {
+  state.placedPets = state.placedPets.filter((pet) => pet.petId !== id);
+  state.equippedPet = state.placedPets[0]?.petId || null;
+}
+
+function togglePlacedPet(id) {
+  if (petIsPlaced(id)) {
+    pickupPet(id);
+    setStatus(`${pets[id].name} picked up.`);
+  } else if (placePet(id)) {
+    setStatus(`${pets[id].name} placed on your plot.`);
+  }
+}
+
+function placeEgg(eggId) {
+  const egg = state.petEggs.find((candidate) => candidate.id === eggId);
+  if (!egg) return;
+  const occupied = new Set([
+    ...state.petEggs.filter((candidate) => candidate.plotIndex !== null).map((candidate) => candidate.plotIndex),
+    ...state.placedPets.map((pet) => pet.homeIndex)
+  ]);
+  let target = -1;
+  for (let row = 0; row < activeRows(); row += 1) {
+    for (let col = 0; col < activeCols(); col += 1) {
+      const index = row * plot.cols + col;
+      if (!state.cells[index] && !occupied.has(index)) {
+        target = index;
+        break;
+      }
+    }
+    if (target >= 0) break;
+  }
+  if (target < 0) {
+    setStatus("No empty unlocked plot space for that egg.");
+    return;
+  }
+  egg.plotIndex = target;
+  egg.placedAt = Date.now();
+  setStatus(`${egg.name} placed. It will hatch soon.`);
+  saveState();
+  renderUi();
+}
+
+function pickupEgg(eggId) {
+  const egg = state.petEggs.find((candidate) => candidate.id === eggId);
+  if (!egg) return;
+  egg.plotIndex = null;
+  egg.placedAt = null;
+  setStatus(`${egg.name} picked up.`);
+  saveState();
+  renderUi();
+}
+
+function hatchPlacedEgg(eggId) {
+  const egg = state.petEggs.find((candidate) => candidate.id === eggId);
+  if (!egg) return;
+  const petId = egg.hatchPets[Math.floor(Math.random() * egg.hatchPets.length)];
+  if (!state.ownedPets.includes(petId)) {
+    state.ownedPets.push(petId);
+  }
+  state.petEggs = state.petEggs.filter((candidate) => candidate.id !== eggId);
+  placePet(petId);
+  setStatus(`${egg.name} hatched into ${pets[petId].name}.`);
   saveState();
   renderUi();
 }
@@ -1362,8 +1490,22 @@ function hatchEgg(exclusive) {
   if (!state.ownedPets.includes(petId)) {
     state.ownedPets.push(petId);
   }
-  state.equippedPet = petId;
+  placePet(petId);
   setStatus(`${exclusive.name} hatched into ${pet.name}.`);
+}
+
+function addEggToInventory(exclusive) {
+  state.petEggs.push({
+    id: `${exclusive.id}-${Date.now()}-${Math.random().toString(16).slice(2)}`,
+    eggId: exclusive.id,
+    name: exclusive.name,
+    color: exclusive.color,
+    hatchPets: exclusive.hatchPets,
+    hatchSeconds: exclusive.hatchSeconds || 90,
+    placedAt: null,
+    plotIndex: null
+  });
+  setStatus(`${exclusive.name} added to your pet eggs.`);
 }
 
 function openSeedPack(exclusive) {
@@ -1423,7 +1565,7 @@ function buyExclusive(id) {
     addToHotbar("gear", exclusive.itemId);
     setStatus(`${item.name} added to your hotbar.`);
   } else if (exclusive.type === "egg") {
-    hatchEgg(exclusive);
+    addEggToInventory(exclusive);
   } else if (exclusive.type === "pack") {
     openSeedPack(exclusive);
   } else if (exclusive.type === "cosmetic") {
@@ -1436,7 +1578,7 @@ function buyExclusive(id) {
     if (!state.ownedPets.includes(exclusive.petId)) {
       state.ownedPets.push(exclusive.petId);
     }
-    state.equippedPet = exclusive.petId;
+    placePet(exclusive.petId);
     setStatus(`${pets[exclusive.petId].name} joined your garden.`);
   }
 
@@ -1457,7 +1599,7 @@ function turnInFruitForEventCurrency() {
     setStatus("Harvest fruit before turning it in.");
     return;
   }
-  const bonus = state.equippedPet === "queenBee" ? 1.35 : 1;
+  const bonus = hasActivePet("queenBee") ? 1.35 : 1;
   const earned = Math.max(1, Math.round((base / event.turnInRate) * bonus));
   state.inventory = {};
   state.eventCoins += earned;
@@ -1489,7 +1631,7 @@ function restock() {
   }
   state.seedBag.carrot = (state.seedBag.carrot || 0) + 2;
   state.seedBag.berry = (state.seedBag.berry || 0) + 1;
-  if (state.equippedPet === "snowSprite") {
+  if (hasActivePet("snowSprite")) {
     const ids = Object.keys(seeds);
     const id = ids[Math.floor(Math.random() * ids.length)];
     state.seedBag[id] = (state.seedBag[id] || 0) + 1;
@@ -1565,7 +1707,7 @@ function useGear(id, index) {
   }
 
   if (id === "wateringCan") {
-    plant.watered = state.equippedPet === "frog" ? 28 : 14;
+    plant.watered = hasActivePet("frog") ? 28 : 14;
     plant.progress = Math.min(plant.growTime, plant.progress + 8);
     addTaskProgress("water");
     setStatus("Watered crop growth boosted.");
@@ -1623,7 +1765,7 @@ function waterArea(index) {
       if (x < 0 || y < 0 || x >= plot.cols || y >= plot.rows) continue;
       const plant = state.cells[y * plot.cols + x];
       if (!plant) continue;
-      plant.watered = state.equippedPet === "frog" ? 28 : 14;
+      plant.watered = hasActivePet("frog") ? 28 : 14;
       plant.progress = Math.min(plant.growTime, plant.progress + 5);
       watered += 1;
     }
@@ -1685,7 +1827,7 @@ function plantSeed(id, index) {
 
   const seed = seeds[id];
   state.seedBag[id] -= 1;
-  if (state.equippedPet === "squirrel" && Math.random() < 0.18) {
+  if (hasActivePet("squirrel") && Math.random() < 0.18) {
     state.seedBag[id] += 1;
     setStatus("Seed Squirrel saved a seed.");
   }
@@ -1780,6 +1922,16 @@ function handlePlotClick(index) {
     setStatus("Expand your plot in the shop to use that soil.");
     return;
   }
+  const egg = state.petEggs.find((candidate) => candidate.plotIndex === index);
+  if (egg) {
+    const elapsed = (Date.now() - (egg.placedAt || Date.now())) / 1000;
+    if (elapsed >= egg.hatchSeconds) {
+      hatchPlacedEgg(egg.id);
+    } else {
+      setStatus(`${egg.name} hatches in ${Math.ceil(egg.hatchSeconds - elapsed)}s.`);
+    }
+    return;
+  }
   const plant = state.cells[index];
   if (plant && plant.progress >= plant.growTime) {
     harvestCell(index);
@@ -1832,6 +1984,20 @@ function cellAt(clientX, clientY) {
     ctx.stroke();
   });
 
+  const selected = activeItem();
+  if (selected && selected.type === "gear" && selected.id === "sprinkler" && state.hoverCell >= 0 && isUnlockedCell(state.hoverCell)) {
+    const b = cellBounds(state.hoverCell);
+    const rangeX = b.x - cellW - plot.gap;
+    const rangeY = b.y - cellH - plot.gap;
+    ctx.fillStyle = "rgba(200, 234, 116, 0.14)";
+    drawRoundedRect(rangeX, rangeY, cellW * 3 + plot.gap * 2, cellH * 3 + plot.gap * 2, 14);
+    ctx.fill();
+    ctx.strokeStyle = "rgba(200, 234, 116, 0.85)";
+    ctx.lineWidth = 3;
+    ctx.stroke();
+    drawSprinklerModel(b.x + b.w / 2, b.y + b.h / 2, time, true);
+  }
+
   for (let row = 0; row < plot.rows; row += 1) {
     for (let col = 0; col < plot.cols; col += 1) {
       if (col >= activeCols() || row >= activeRows()) continue;
@@ -1861,8 +2027,34 @@ function cellBounds(index) {
 }
 
 function updatePlantTooltip(event) {
+  const rect = canvas.getBoundingClientRect();
+  const sx = canvas.width / rect.width;
+  const sy = canvas.height / rect.height;
+  const canvasX = (event.clientX - rect.left) * sx;
+  const canvasY = (event.clientY - rect.top) * sy;
+  const hoveredPet = state.placedPets.find((placed) => {
+    const pos = petPosition(placed, performance.now());
+    return Math.hypot(canvasX - pos.x, canvasY - pos.y) < 28;
+  });
+  if (hoveredPet && pets[hoveredPet.petId]) {
+    const pet = pets[hoveredPet.petId];
+    ui.plantTooltip.innerHTML = `<strong>${pet.name}</strong><span>Age:</span> ${petAgeText(hoveredPet)}<br><span>Ability:</span> ${pet.description}`;
+    ui.plantTooltip.style.left = `${event.clientX + 14}px`;
+    ui.plantTooltip.style.top = `${event.clientY + 14}px`;
+    ui.plantTooltip.style.display = "block";
+    return;
+  }
+
   const index = cellAt(event.clientX, event.clientY);
   state.hoverCell = index;
+  const active = activeItem();
+  if (active && active.type === "gear" && active.id === "sprinkler" && index >= 0) {
+    ui.plantTooltip.innerHTML = `<strong>Place Sprinkler</strong><span>Range:</span> 3 x 3 plot tiles<br><span>Effect:</span> grows crops bigger and faster`;
+    ui.plantTooltip.style.left = `${event.clientX + 14}px`;
+    ui.plantTooltip.style.top = `${event.clientY + 14}px`;
+    ui.plantTooltip.style.display = "block";
+    return;
+  }
   const plant = index >= 0 ? state.cells[index] : null;
   if (!plant || !seeds[plant.seedId]) {
     ui.plantTooltip.style.display = "none";
@@ -1884,6 +2076,58 @@ function drawRoundedRect(x, y, w, h, r) {
   ctx.arcTo(x, y + h, x, y, r);
   ctx.arcTo(x, y, x + w, y, r);
   ctx.closePath();
+}
+
+function drawPetModel(pet, x, y, time) {
+  const bob = Math.sin(time / 280 + (pet.phase || 0)) * 3;
+  const data = pets[pet.petId];
+  if (!data) return;
+  ctx.fillStyle = data.color;
+  ctx.beginPath();
+  ctx.ellipse(x, y + bob, 18, 14, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = "rgba(0,0,0,0.18)";
+  ctx.beginPath();
+  ctx.ellipse(x, y + 17 + bob, 20, 6, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = "#10150f";
+  ctx.beginPath();
+  ctx.arc(x - 6, y - 3 + bob, 2.5, 0, Math.PI * 2);
+  ctx.arc(x + 6, y - 3 + bob, 2.5, 0, Math.PI * 2);
+  ctx.fill();
+  if (pet.petId.includes("bee") || pet.petId === "mutationMoth") {
+    ctx.fillStyle = "rgba(255,255,255,0.55)";
+    ctx.beginPath();
+    ctx.ellipse(x - 14, y - 10 + bob, 9, 5, -0.6, 0, Math.PI * 2);
+    ctx.ellipse(x + 14, y - 10 + bob, 9, 5, 0.6, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.fillStyle = "#10150f";
+  ctx.font = "800 10px Inter, sans-serif";
+  ctx.textAlign = "center";
+  ctx.fillText(data.mark, x, y + 8 + bob);
+  ctx.textAlign = "left";
+}
+
+function drawSprinklerModel(cx, cy, time, preview = false) {
+  ctx.save();
+  ctx.globalAlpha = preview ? 0.72 : 1;
+  ctx.fillStyle = "#6eb7d8";
+  ctx.beginPath();
+  ctx.arc(cx, cy, 12, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = "#f4f1e8";
+  ctx.fillRect(cx - 3, cy - 20, 6, 20);
+  ctx.strokeStyle = preview ? "rgba(200, 234, 116, 0.85)" : "rgba(180, 225, 245, 0.75)";
+  ctx.lineWidth = preview ? 3 : 2;
+  for (let i = 0; i < 6; i += 1) {
+    const angle = time / 500 + i * Math.PI / 3;
+    ctx.beginPath();
+    ctx.moveTo(cx, cy - 18);
+    ctx.lineTo(cx + Math.cos(angle) * 26, cy - 18 + Math.sin(angle) * 26);
+    ctx.stroke();
+  }
+  ctx.restore();
 }
 
 function drawStar(cx, cy, outer, inner) {
@@ -2026,11 +2270,45 @@ function renderShop() {
 
 function renderPets() {
   ui.petList.innerHTML = "";
+  const header = document.createElement("div");
+  header.className = "inventory-item";
+  header.innerHTML = `<div></div><div><div class="item-name">Active pets ${activePetCount()}/${state.petCapacity}</div><div class="item-meta">Place pets for bonuses, or pick them up to free space.</div></div>`;
+  ui.petList.appendChild(header);
+
+  if (state.petTab === "eggs") {
+    state.petEggs.forEach((egg) => {
+      const row = document.createElement("div");
+      row.className = "pet-item";
+      const icon = document.createElement("div");
+      icon.className = "pet-icon";
+      icon.style.background = egg.color;
+      icon.style.color = "#10150f";
+      icon.textContent = "EG";
+      const remaining = egg.placedAt ? Math.max(0, Math.ceil(egg.hatchSeconds - (Date.now() - egg.placedAt) / 1000)) : null;
+      const text = document.createElement("div");
+      text.innerHTML = `<div class="item-name">${egg.name}</div><div class="item-meta">${egg.placedAt ? remaining ? `Hatches in ${remaining}s` : "Ready to hatch on plot" : "Not placed"}</div>`;
+      const button = document.createElement("button");
+      button.className = "buy-button";
+      button.type = "button";
+      button.textContent = egg.placedAt ? "Pick Up" : "Place";
+      button.addEventListener("click", () => egg.placedAt ? pickupEgg(egg.id) : placeEgg(egg.id));
+      row.append(icon, text, button);
+      ui.petList.appendChild(row);
+    });
+    if (state.petEggs.length === 0) {
+      const empty = document.createElement("div");
+      empty.className = "inventory-item";
+      empty.innerHTML = "<div></div><div><div class=\"item-name\">No eggs</div><div class=\"item-meta\">Buy special eggs from event shops.</div></div>";
+      ui.petList.appendChild(empty);
+    }
+    return;
+  }
+
   Object.values(pets).filter((pet) => !pet.eventOnly || state.ownedPets.includes(pet.id)).forEach((pet) => {
     const owned = state.ownedPets.includes(pet.id);
-    const equipped = state.equippedPet === pet.id;
+    const placed = petIsPlaced(pet.id);
     const row = document.createElement("div");
-    row.className = `pet-item${equipped ? " equipped" : ""}`;
+    row.className = `pet-item${placed ? " equipped" : ""}`;
 
     const icon = document.createElement("div");
     icon.className = "pet-icon";
@@ -2044,7 +2322,7 @@ function renderPets() {
     const button = document.createElement("button");
     button.className = "buy-button";
     button.type = "button";
-    button.textContent = owned ? (equipped ? "Rest" : "Equip") : `${pet.cost}c`;
+    button.textContent = owned ? (placed ? "Pick Up" : "Place") : `${pet.cost}c`;
     button.disabled = !state.devMode && !owned && state.coins < pet.cost;
     button.addEventListener("click", () => buyPet(pet.id));
 
@@ -2099,7 +2377,8 @@ function renderHotbar() {
       icon.className = "slot-icon";
       drawIcon(icon, data, slot.type);
       const text = document.createElement("div");
-      text.innerHTML = `<small>${index + 1} - ${countBagItem(slot.type, slot.id)} left</small><strong>${data.name}</strong>`;
+      const suffix = slot.type === "seed" ? " Seed" : "";
+      text.innerHTML = `<small>${index + 1}</small><strong>x${countBagItem(slot.type, slot.id)} ${data.name}${suffix}</strong>`;
       button.append(icon, text);
     }
     ui.hotbar.appendChild(button);
@@ -2173,6 +2452,7 @@ function renderUi() {
   ui.shopDrawer.classList.toggle("open", state.shopOpen);
   ui.shopToggleButton.textContent = state.shopOpen ? "Close Shop" : "Shop";
   ui.plotSize.textContent = `Current plot: ${activeCols()} x ${activeRows()}`;
+  ui.petHint.textContent = `${activePetCount()}/${state.petCapacity} active`;
   const cols = activeCols();
   const rows = activeRows();
   const nextCells = cols < plot.cols ? rows : cols;
@@ -2210,10 +2490,15 @@ function updatePlants(dt) {
       plant.progress = Math.min(plant.growTime, plant.progress + dt * multiplier);
     }
   });
+  state.petEggs.forEach((egg) => {
+    if (egg.placedAt && Date.now() - egg.placedAt >= egg.hatchSeconds * 1000) {
+      hatchPlacedEgg(egg.id);
+    }
+  });
 }
 
 function runPetMutation() {
-  if (state.equippedPet !== "mutationMoth") return;
+  if (!hasActivePet("mutationMoth")) return;
   if (Date.now() - (state.lastPetMutationAt || 0) < 60000) return;
   const candidates = state.cells
     .map((plant, index) => ({ plant, index }))
@@ -2476,35 +2761,28 @@ function drawGarden(time) {
     const b = cellBounds(sprinkler.index);
     const cx = b.x + b.w / 2;
     const cy = b.y + b.h / 2;
-    ctx.fillStyle = "#6eb7d8";
-    ctx.beginPath();
-    ctx.arc(cx, cy, 12, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = "#f4f1e8";
-    ctx.fillRect(cx - 3, cy - 20, 6, 20);
-    ctx.strokeStyle = "rgba(180, 225, 245, 0.75)";
-    ctx.lineWidth = 2;
-    for (let i = 0; i < 6; i += 1) {
-      const angle = time / 500 + i * Math.PI / 3;
-      ctx.beginPath();
-      ctx.moveTo(cx, cy - 18);
-      ctx.lineTo(cx + Math.cos(angle) * 26, cy - 18 + Math.sin(angle) * 26);
-      ctx.stroke();
-    }
+    drawSprinklerModel(cx, cy, time);
   });
 
-  const pet = petBonus();
-  if (pet) {
-    ctx.fillStyle = pet.color;
+  state.petEggs.forEach((egg) => {
+    if (egg.plotIndex === null) return;
+    const b = cellBounds(egg.plotIndex);
+    const remaining = Math.max(0, Math.ceil(egg.hatchSeconds - (Date.now() - egg.placedAt) / 1000));
+    ctx.fillStyle = egg.color;
     ctx.beginPath();
-    ctx.arc(55 + Math.sin(time / 600) * 6, canvas.height - 48, 20, 0, Math.PI * 2);
+    ctx.ellipse(b.x + b.w / 2, b.y + b.h / 2, 17, 22, 0, 0, Math.PI * 2);
     ctx.fill();
     ctx.fillStyle = "#10150f";
-    ctx.font = "800 12px Inter, sans-serif";
+    ctx.font = "800 10px Inter, sans-serif";
     ctx.textAlign = "center";
-    ctx.fillText(pet.mark, 55 + Math.sin(time / 600) * 6, canvas.height - 44);
+    ctx.fillText(remaining ? `${remaining}s` : "HATCH", b.x + b.w / 2, b.y + b.h / 2 + 4);
     ctx.textAlign = "left";
-  }
+  });
+
+  state.placedPets.forEach((pet) => {
+    const pos = petPosition(pet, time);
+    drawPetModel(pet, pos.x, pos.y, time);
+  });
 
   if (state.equippedCosmetic === "discoBall") {
     const cx = canvas.width - 72;
@@ -2683,6 +2961,16 @@ document.querySelectorAll("[data-inventory-tab]").forEach((button) => {
     });
     saveState();
     renderItemInventory();
+  });
+});
+document.querySelectorAll("[data-pet-tab]").forEach((button) => {
+  button.addEventListener("click", () => {
+    state.petTab = button.dataset.petTab;
+    document.querySelectorAll("[data-pet-tab]").forEach((tab) => {
+      tab.classList.toggle("active", tab === button);
+    });
+    saveState();
+    renderPets();
   });
 });
 
