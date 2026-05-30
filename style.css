@@ -589,6 +589,12 @@ h3 {
   outline-offset: -3px;
 }
 
+.slot.drop-target {
+  outline: 3px dashed var(--gold);
+  outline-offset: -4px;
+  background: #354127;
+}
+
 .slot small,
 .slot strong {
   display: block;

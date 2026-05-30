@@ -486,6 +486,157 @@ const pets = {
 };
 
 const exclusiveItems = {
+  drizzleSeedPack: {
+    id: "drizzleSeedPack",
+    type: "pack",
+    name: "Drizzle Seed Pack",
+    event: "drizzle",
+    cost: 55,
+    color: "#6eb7d8",
+    description: "Rainy pack with extra berry and melon chances.",
+    seeds: ["carrot", "berry", "berry", "tomato", "melon"]
+  },
+  rainEgg: {
+    id: "rainEgg",
+    type: "egg",
+    name: "Rain Egg",
+    event: "drizzle",
+    cost: 125,
+    color: "#6eb7d8",
+    description: "Hatches into a pet that likes wet gardens.",
+    hatchPets: ["frog", "turtle", "bee"]
+  },
+  marketSeedPack: {
+    id: "marketSeedPack",
+    type: "pack",
+    name: "Market Seed Pack",
+    event: "market",
+    cost: 65,
+    color: "#f0bd45",
+    description: "A merchant pack with profitable crop chances.",
+    seeds: ["tomato", "melon", "pumpkin", "starfruit", "grape"]
+  },
+  merchantEgg: {
+    id: "merchantEgg",
+    type: "egg",
+    name: "Merchant Egg",
+    event: "market",
+    cost: 150,
+    color: "#f0bd45",
+    description: "Hatches into a pet useful for making money.",
+    hatchPets: ["bee", "phoenix", "squirrel"]
+  },
+  sunSeedPack: {
+    id: "sunSeedPack",
+    type: "pack",
+    name: "Sun Seed Pack",
+    event: "sun",
+    cost: 60,
+    color: "#f08732",
+    description: "Warm-weather seeds with pumpkin and starfruit chances.",
+    seeds: ["carrot", "tomato", "pumpkin", "starfruit", "dragonfruit"]
+  },
+  solarEgg: {
+    id: "solarEgg",
+    type: "egg",
+    name: "Solar Egg",
+    event: "sun",
+    cost: 155,
+    color: "#f08732",
+    description: "Hatches into a sun-loving pet.",
+    hatchPets: ["fox", "phoenix", "bee"]
+  },
+  moonSeedPack: {
+    id: "moonSeedPack",
+    type: "pack",
+    name: "Moon Seed Pack",
+    event: "moon",
+    cost: 70,
+    color: "#8f9bd8",
+    description: "A night pack with rare seed chances.",
+    seeds: ["berry", "grape", "starfruit", "dragonfruit", "crystalBloom"]
+  },
+  moonEgg: {
+    id: "moonEgg",
+    type: "egg",
+    name: "Moon Egg",
+    event: "moon",
+    cost: 160,
+    color: "#8f9bd8",
+    description: "Hatches into a pet with night-garden energy.",
+    hatchPets: ["owl", "turtle", "fox"]
+  },
+  festivalSeedPack: {
+    id: "festivalSeedPack",
+    type: "pack",
+    name: "Festival Seed Pack",
+    event: "festival",
+    cost: 75,
+    color: "#dd6bb2",
+    description: "A colorful pack with mixed rare seed chances.",
+    seeds: ["tomato", "melon", "pumpkin", "starfruit", "grape", "dragonfruit"]
+  },
+  petalEgg: {
+    id: "petalEgg",
+    type: "egg",
+    name: "Petal Egg",
+    event: "festival",
+    cost: 175,
+    color: "#dd6bb2",
+    description: "Hatches into a festival pet.",
+    hatchPets: ["squirrel", "owl", "lotusSpirit"]
+  },
+  meteorSeedPack: {
+    id: "meteorSeedPack",
+    type: "pack",
+    name: "Meteor Seed Pack",
+    event: "meteor",
+    cost: 85,
+    color: "#c99a5a",
+    description: "Meteor-touched seeds with high-tier chances.",
+    seeds: ["pumpkin", "starfruit", "grape", "dragonfruit", "crystalBloom"]
+  },
+  meteorSprinkler: { id: "meteorSprinkler", type: "gear", itemId: "sprinkler", event: "meteor", cost: 115 },
+  frostSeedPack: {
+    id: "frostSeedPack",
+    type: "pack",
+    name: "Frost Seed Pack",
+    event: "frost",
+    cost: 80,
+    color: "#b9e7ff",
+    description: "Cold-weather pack with premium crop chances.",
+    seeds: ["melon", "pumpkin", "starfruit", "dragonfruit", "crystalBloom"]
+  },
+  frostEgg: {
+    id: "frostEgg",
+    type: "egg",
+    name: "Frost Egg",
+    event: "frost",
+    cost: 165,
+    color: "#b9e7ff",
+    description: "Hatches into a chilly garden pet.",
+    hatchPets: ["snowSprite", "frog", "turtle"]
+  },
+  bugSeedPack: {
+    id: "bugSeedPack",
+    type: "pack",
+    name: "Bug Hunt Seed Pack",
+    event: "bug",
+    cost: 60,
+    color: "#79d46d",
+    description: "A lucky pack with extra starter and mid-tier seeds.",
+    seeds: ["carrot", "berry", "tomato", "melon", "pumpkin", "starfruit"]
+  },
+  bugEgg: {
+    id: "bugEgg",
+    type: "egg",
+    name: "Bug Egg",
+    event: "bug",
+    cost: 140,
+    color: "#79d46d",
+    description: "Hatches into a helpful garden pet.",
+    hatchPets: ["squirrel", "frog", "bee"]
+  },
   honeySprout: { id: "honeySprout", type: "seed", itemId: "honeySprout", event: "honey", cost: 65 },
   sugarCane: { id: "sugarCane", type: "seed", itemId: "sugarCane", event: "honey", cost: 135 },
   honeyGlazer: { id: "honeyGlazer", type: "gear", itemId: "honeyGlazer", event: "honey", cost: 90 },
@@ -616,6 +767,7 @@ const events = [
     sky: "#445c55",
     growthMultiplier: 1.35,
     saleMultiplier: 1,
+    exclusiveShop: ["drizzleSeedPack", "rainEgg"],
     tasks: [
       { id: "plant", label: "Plant 5 seeds", target: 5, reward: 18 },
       { id: "water", label: "Water 4 crops", target: 4, reward: 14 }
@@ -628,6 +780,7 @@ const events = [
     sky: "#5f5142",
     growthMultiplier: 1,
     saleMultiplier: 1.3,
+    exclusiveShop: ["marketSeedPack", "merchantEgg"],
     tasks: [
       { id: "harvest", label: "Harvest 6 fruits", target: 6, reward: 24 },
       { id: "sell", label: "Sell fruit twice", target: 2, reward: 18 }
@@ -641,6 +794,7 @@ const events = [
     growthMultiplier: 1,
     wateredMultiplier: 2,
     saleMultiplier: 1,
+    exclusiveShop: ["sunSeedPack", "solarEgg"],
     tasks: [
       { id: "water", label: "Water 6 crops", target: 6, reward: 22 },
       { id: "plant", label: "Plant 4 seeds", target: 4, reward: 14 }
@@ -654,6 +808,7 @@ const events = [
     growthMultiplier: 1,
     saleMultiplier: 1,
     rareDiscount: 0.8,
+    exclusiveShop: ["moonSeedPack", "moonEgg"],
     tasks: [
       { id: "buy", label: "Buy 3 shop items", target: 3, reward: 20 },
       { id: "harvest", label: "Harvest 3 fruits", target: 3, reward: 16 }
@@ -667,6 +822,7 @@ const events = [
     growthMultiplier: 1.1,
     saleMultiplier: 1,
     taskMultiplier: 2,
+    exclusiveShop: ["festivalSeedPack", "petalEgg"],
     tasks: [
       { id: "plant", label: "Plant 8 seeds", target: 8, reward: 24 },
       { id: "sell", label: "Sell fruit once", target: 1, reward: 20 }
@@ -680,6 +836,7 @@ const events = [
     growthMultiplier: 1,
     saleMultiplier: 1.15,
     fertilizerBonus: 1.35,
+    exclusiveShop: ["meteorSeedPack", "meteorSprinkler"],
     tasks: [
       { id: "fertilize", label: "Fertilize 3 crops", target: 3, reward: 18 },
       { id: "harvest", label: "Harvest 5 fruits", target: 5, reward: 20 }
@@ -694,6 +851,7 @@ const events = [
     saleMultiplier: 1,
     premiumSeeds: ["crystalBloom", "dragonfruit"],
     premiumMultiplier: 1.45,
+    exclusiveShop: ["frostSeedPack", "frostEgg"],
     tasks: [
       { id: "buy", label: "Buy 4 shop items", target: 4, reward: 26 },
       { id: "premiumHarvest", label: "Harvest 4 premium fruits", target: 4, reward: 32 }
@@ -707,6 +865,7 @@ const events = [
     growthMultiplier: 1.15,
     saleMultiplier: 1,
     plantingPetalChance: 0.18,
+    exclusiveShop: ["bugSeedPack", "bugEgg"],
     tasks: [
       { id: "plant", label: "Plant 10 seeds", target: 10, reward: 28 },
       { id: "water", label: "Water 5 crops", target: 5, reward: 18 }
@@ -1296,6 +1455,7 @@ function countBagItem(type, id) {
 }
 
 function activeItem() {
+  cleanHotbar();
   return state.hotbar[state.selectedSlot];
 }
 
@@ -1329,6 +1489,7 @@ function ownedExclusive(exclusive) {
 }
 
 function addToHotbar(type, id) {
+  cleanHotbar();
   const existing = state.hotbar.findIndex((slot) => slot && slot.type === type && slot.id === id);
   if (existing >= 0) {
     state.selectedSlot = existing;
@@ -1341,6 +1502,14 @@ function addToHotbar(type, id) {
     return true;
   }
   return false;
+}
+
+function cleanHotbar() {
+  state.hotbar = state.hotbar.map((slot) => {
+    if (!slot || !itemData(slot) || countBagItem(slot.type, slot.id) <= 0) return null;
+    return slot;
+  });
+  while (state.hotbar.length < 8) state.hotbar.push(null);
 }
 
 function buy(type, id) {
@@ -1753,6 +1922,7 @@ function useGear(id, index) {
 
   state.gearBag[id] -= 1;
   saveState();
+  cleanHotbar();
   renderUi();
 }
 
@@ -1854,6 +2024,7 @@ function plantSeed(id, index) {
     setStatus(`${seed.name} planted.`);
   }
   saveState();
+  cleanHotbar();
   renderUi();
 }
 
@@ -2358,11 +2529,28 @@ function renderInventory() {
 }
 
 function renderHotbar() {
+  cleanHotbar();
   ui.hotbar.innerHTML = "";
   state.hotbar.forEach((slot, index) => {
     const button = document.createElement("button");
     button.className = `slot${index === state.selectedSlot ? " active" : ""}`;
     button.type = "button";
+    button.dataset.slotIndex = index;
+    button.addEventListener("dragover", (event) => {
+      event.preventDefault();
+      button.classList.add("drop-target");
+    });
+    button.addEventListener("dragleave", () => {
+      button.classList.remove("drop-target");
+    });
+    button.addEventListener("drop", (event) => {
+      event.preventDefault();
+      button.classList.remove("drop-target");
+      const raw = event.dataTransfer.getData("application/json");
+      if (!raw) return;
+      const item = JSON.parse(raw);
+      equipToHotbarSlot(item.type, item.id, index);
+    });
     button.addEventListener("click", () => {
       state.selectedSlot = index;
       saveState();
@@ -2398,8 +2586,14 @@ function closeInventory() {
 
 function equipFromInventory(type, id) {
   if (countBagItem(type, id) <= 0) return;
-  state.hotbar[state.selectedSlot] = { type, id };
-  setStatus(`${type === "seed" ? seeds[id].name : gear[id].name} equipped in slot ${state.selectedSlot + 1}.`);
+  equipToHotbarSlot(type, id, state.selectedSlot);
+}
+
+function equipToHotbarSlot(type, id, slotIndex) {
+  if (countBagItem(type, id) <= 0) return;
+  state.hotbar[slotIndex] = { type, id };
+  state.selectedSlot = slotIndex;
+  setStatus(`${type === "seed" ? seeds[id].name : gear[id].name} equipped in slot ${slotIndex + 1}.`);
   saveState();
   renderHotbar();
 }
@@ -2417,6 +2611,11 @@ function renderItemInventory() {
       const button = document.createElement("button");
       button.className = "inventory-pick";
       button.type = "button";
+      button.draggable = true;
+      button.addEventListener("dragstart", (event) => {
+        event.dataTransfer.setData("application/json", JSON.stringify({ type: type === "seeds" ? "seed" : "gear", id }));
+        event.dataTransfer.effectAllowed = "move";
+      });
       const icon = document.createElement("div");
       icon.className = "slot-icon";
       drawIcon(icon, data, type === "seeds" ? "seed" : "gear");
